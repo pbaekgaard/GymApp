@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
 import 'constants/colors.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? super.key});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
