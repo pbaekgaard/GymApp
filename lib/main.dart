@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
 import 'constants/colors.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Overload',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'ProgBud'),
+      home: const MyHomePage(title: 'Overload'),
     );
   }
 }
@@ -67,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   static final List<Widget> _pages = <Widget>[
-    Exercises(),
-    Statistics(),
+    const Exercises(),
+    const Statistics(),
   ];
 
   @override
@@ -88,22 +89,18 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: pbBG,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title:
-            Center(child: Text(widget.title, style: TextStyle(color: pbBlack))),
+        title: Center(
+            child: Text(widget.title, style: const TextStyle(color: pbBlack))),
       ),
       body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-          child: IndexedStack(
-            index: _selectedIndex,
-            // Center is a layout widget. It takes a single child and positions it
-            // in the middle of the parent.
-            children: _pages,
-          )),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        child: _pages[_selectedIndex],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
-            label: 'List',
+            label: 'Exercises',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),

@@ -1,16 +1,16 @@
-final String tableExercise = 'exercises';
+const String tableExercise = 'exercises';
 
 class ExerciseFields {
-  static final String id = '_id';
-  static final String exerciseText = 'exerciseText';
-  static final String weights = 'weights';
-  static final String updateDates = 'updateDates';
+  static const String id = '_id';
+  static const String exerciseText = 'exerciseText';
+  static const String weights = 'weights';
+  static const String updateDates = 'updateDates';
 }
 
 class Exercise {
   final int? id;
   final String exerciseText;
-  final List<int> weights;
+  final List<double> weights;
   final List<String> updateDates;
 
   const Exercise({
@@ -23,22 +23,24 @@ class Exercise {
   Map<String, Object?> toJson() => {
         ExerciseFields.id: id,
         ExerciseFields.exerciseText: exerciseText,
-        ExerciseFields.weights: weights,
+        ExerciseFields.weights: weights.join(','),
         ExerciseFields.updateDates: updateDatesString,
       };
 
   static Exercise fromJson(Map<String, Object?> json) => Exercise(
         id: json[ExerciseFields.id] as int?,
         exerciseText: json[ExerciseFields.exerciseText] as String,
-        weights:
-            (json['weights']! as Iterable).cast().map((e) => e as int).toList(),
+        weights: (json['weights'] as String)
+            .split(',')
+            .map((weightStr) => double.parse(weightStr))
+            .toList(),
         updateDates: (json[ExerciseFields.updateDates] as String).split(','),
       );
 
   Exercise copy({
     int? id,
     String? exerciseText,
-    List<int>? weights,
+    List<double>? weights,
     List<String>? updateDates,
   }) =>
       Exercise(

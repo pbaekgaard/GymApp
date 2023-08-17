@@ -25,18 +25,11 @@ class _ExerciseItem extends State<ExerciseItem> {
     refreshExercises();
   }
 
-  @override
-  void dispose() {
-    ExerciseDatabase.instance.close();
-
-    super.dispose();
-  }
-
   Future refreshExercises() async {
-    this.exercisesList = await ExerciseDatabase.instance.readAllExercises();
+    exercisesList = await ExerciseDatabase.instance.readAllExercises();
   }
 
-  Future<void> showAddExerciseDialog(BuildContext context) async {
+  Future<void> showUpdateExerciseDialog(BuildContext context) async {
     return await showDialog(
         context: context,
         builder: (context) {
@@ -59,25 +52,26 @@ class _ExerciseItem extends State<ExerciseItem> {
                               return "Please specify a weight";
                             }
                           },
-                          decoration: InputDecoration(hintText: "Weight")),
+                          decoration:
+                              const InputDecoration(hintText: "Weight")),
                     ],
                   ),
                 ),
                 actions: <Widget>[
                   TextButton(
-                    child: Text("Update"),
+                    child: const Text("Update"),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         Exercise updatedExercise = exercise;
                         final String currentDate =
                             DateTime.now().toString().substring(0, 10);
-                        if (!exercise.updateDates.contains(currentDate)) {
+                        if (!(exercise.updateDates.last == currentDate)) {
                           exercise.weights
-                              .add(int.parse(_weightEditingController.text));
+                              .add(double.parse(_weightEditingController.text));
                           exercise.updateDates.add(currentDate);
                         } else {
                           exercise.weights.last =
-                              int.parse(_weightEditingController.text);
+                              double.parse(_weightEditingController.text);
                         }
                         exercisesList[exercisesList.indexWhere(
                                 (element) => element.id == exercise.id)] =
@@ -94,43 +88,114 @@ class _ExerciseItem extends State<ExerciseItem> {
         });
   }
 
+  Future<bool> showRemoveExerciseDialog(BuildContext context) async {
+    bool remove = false;
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+                title: Icon(Icons.delete, size: 32),
+                contentTextStyle: TextStyle(color: pbBlack, fontSize: 16),
+                content: Text("Are you sure you want to delete this exercise?"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("Yes, remove it!"),
+                    onPressed: () {
+                      remove = true;
+                      setState(() => ());
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ]);
+          });
+        });
+    return remove;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(bottom: 10),
-        child: ListTile(
-          onTap: () async {
-            await showAddExerciseDialog(context);
-            setState(() {});
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Dismissible(
+          key: Key(exercise.id.toString()),
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.endToStart) {
+              await showUpdateExerciseDialog(context);
+              setState(() => {});
+              return false;
+            } else {
+              bool delete = false;
+              delete = await showRemoveExerciseDialog(context);
+              if (delete) {
+                final snackbarController =
+                    ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Deleted ${exercise.exerciseText}'),
+                    action: SnackBarAction(
+                        label: 'Undo', onPressed: () => delete = false),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+                await snackbarController.closed;
+                if (delete) {
+                  await ExerciseDatabase.instance.removeExercise(exercise);
+                }
+              }
+              setState(() => {});
+              return delete;
+            }
           },
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+          background: Container(
+            child: Icon(Icons.delete, color: Colors.white),
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: pbRed,
+            ),
           ),
-          tileColor: Colors.white,
-          title: Text(exercise.exerciseText, style: TextStyle(color: pbBlack)),
-          trailing: Wrap(children: [
-            Text(exercise.weights.last.toString() + "kg",
-                style: TextStyle(
-                    color: exercise.weights.length > 1
-                        ? (exercise.weights.last >
-                                exercise.weights[exercise.weights.length - 2]
-                            ? Colors.green
-                            : exercise.weights.last ==
-                                    exercise
-                                        .weights[exercise.weights.length - 2]
-                                ? pbBlack
-                                : pbRed)
-                        : pbBlack)),
-            exercise.weights.length > 1
-                ? (exercise.weights.last >
-                        exercise.weights[exercise.weights.length - 2]
-                    ? Icon(Icons.trending_up, size: 20, color: Colors.green)
-                    : exercise.weights.last ==
-                            exercise.weights[exercise.weights.length - 2]
-                        ? Icon(Icons.trending_neutral, size: 20, color: pbBlack)
-                        : Icon(Icons.trending_down, size: 20, color: pbRed))
-                : Icon(Icons.trending_neutral, size: 20, color: pbBlack)
-          ]),
-        ));
+          secondaryBackground: Container(
+            child: Icon(Icons.edit, color: Colors.white),
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(15)),
+          ),
+          child: ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            tileColor: Colors.white,
+            title: Text(exercise.exerciseText,
+                style: const TextStyle(color: pbBlack)),
+            trailing: Wrap(children: [
+              Text("${exercise.weights.last}kg",
+                  style: TextStyle(
+                      color: exercise.weights.length > 1
+                          ? (exercise.weights.last >
+                                  exercise.weights[exercise.weights.length - 2]
+                              ? Colors.green
+                              : exercise.weights.last ==
+                                      exercise
+                                          .weights[exercise.weights.length - 2]
+                                  ? pbBlack
+                                  : pbRed)
+                          : pbBlack)),
+              exercise.weights.length > 1
+                  ? (exercise.weights.last >
+                          exercise.weights[exercise.weights.length - 2]
+                      ? const Icon(Icons.trending_up,
+                          size: 20, color: Colors.green)
+                      : exercise.weights.last ==
+                              exercise.weights[exercise.weights.length - 2]
+                          ? const Icon(Icons.trending_neutral,
+                              size: 20, color: pbBlack)
+                          : const Icon(Icons.trending_down,
+                              size: 20, color: pbRed))
+                  : const Icon(Icons.trending_neutral, size: 20, color: pbBlack)
+            ]),
+          )),
+    );
   }
 }

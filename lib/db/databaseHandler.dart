@@ -25,10 +25,10 @@ class ExerciseDatabase {
   }
 
   Future _createDB(Database db, int version) async {
-    final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    final exerciseTextType = 'STRING';
-    final weightsType = 'TEXT';
-    final updateDatesType = 'TEXT';
+    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    const exerciseTextType = 'TEXT NOT NULL';
+    const weightsType = 'TEXT NOT NULL';
+    const updateDatesType = 'TEXT NOT NULL';
     await db.execute('''
     CREATE TABLE $tableExercise (
       ${ExerciseFields.id} $idType,
@@ -50,7 +50,8 @@ class ExerciseDatabase {
   Future<Exercise> addExercise(Exercise exercise) async {
     final db = await instance.database;
 
-    final id = await db.insert(tableExercise, exercise.toJson());
+    final id = await db.insert(tableExercise, exercise.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
     return exercise.copy(id: id);
   }
 
@@ -68,5 +69,12 @@ class ExerciseDatabase {
   Future close() async {
     final db = await instance.database;
     db.close();
+  }
+
+  Future<int> removeExercise(Exercise exercise) async {
+    final db = await instance.database;
+
+    return db.delete(tableExercise,
+        where: '${ExerciseFields.id}=?', whereArgs: [exercise.id]);
   }
 }

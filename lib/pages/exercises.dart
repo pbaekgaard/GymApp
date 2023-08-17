@@ -16,7 +16,7 @@ class _Exercises extends State<Exercises> {
   final _exerciseController = TextEditingController();
   final _weightController = TextEditingController();
   bool isLoading = false;
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -25,22 +25,21 @@ class _Exercises extends State<Exercises> {
     refreshExercises();
   }
 
-  @override
-  void dispose() {
-    ExerciseDatabase.instance.close();
-
-    super.dispose();
+  void searchExercises(String value) {
+    List<Exercise> results;
+    if (value.isEmpty) {
+      results = exercisesList;
+    } else {
+      results = exercisesList
+          .where((item) => item.exerciseText!.toLowerCase().contains(value))
+          .toList();
+    }
   }
 
   Future refreshExercises() async {
     setState(() => isLoading = true);
 
-    this.exercisesList = await ExerciseDatabase.instance.readAllExercises();
-    for (final exercise in exercisesList) {
-      print('Exercise Text: ${exercise.exerciseText}');
-      print('Weights: ${exercise.weights}');
-      print('Update Dates: ${exercise.updateDates}');
-    }
+    exercisesList = await ExerciseDatabase.instance.readAllExercises();
     setState(() => isLoading = false);
   }
 
@@ -59,17 +58,21 @@ class _Exercises extends State<Exercises> {
                         controller: _exerciseController,
                         validator: (value) {
                           if (value!.isNotEmpty) {
-                            if (exercisesList
+                            if (!value.contains(RegExp(r'[a-zA-Z]'))) {
+                              return "Exercise title must contain at least one alphabetical character.";
+                            } else if (exercisesList
                                 .map((e) => e.exerciseText)
                                 .contains(value)) {
                               return "This exercise already exists";
                             } else {
                               return null;
                             }
-                          } else
+                          } else {
                             return "Invalid Input";
+                          }
                         },
-                        decoration: InputDecoration(hintText: "Exercise Name"),
+                        decoration:
+                            const InputDecoration(hintText: "Exercise Name"),
                       ),
                       TextFormField(
                           keyboardType: TextInputType.number,
@@ -81,19 +84,20 @@ class _Exercises extends State<Exercises> {
                               return "Please specify a weight";
                             }
                           },
-                          decoration: InputDecoration(hintText: "Weight")),
+                          decoration:
+                              const InputDecoration(hintText: "Weight")),
                     ],
                   ),
                 ),
                 actions: <Widget>[
                   TextButton(
-                    child: Text("Add"),
+                    child: const Text("Add"),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         Exercise newExercise = Exercise(
                             exerciseText: _exerciseController.text,
                             weights: [
-                              int.parse(_weightController.text),
+                              double.parse(_weightController.text),
                             ],
                             updateDates: [
                               DateTime.now().toString().substring(0, 10),
@@ -102,7 +106,9 @@ class _Exercises extends State<Exercises> {
                             .addExercise(newExercise);
                         exercisesList =
                             await ExerciseDatabase.instance.readAllExercises();
-                        setState(() => (exercisesList = this.exercisesList));
+                        _weightController.clear();
+                        _exerciseController.clear();
+                        setState(() => (exercisesList = exercisesList));
                         Navigator.of(context).pop();
                       }
                     },
@@ -118,27 +124,54 @@ class _Exercises extends State<Exercises> {
       backgroundColor: pbBG,
       body: Container(
           child: isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : ListView(
+                  padding: const EdgeInsets.only(bottom: 72),
                   children: [
                     Container(
-                      margin: EdgeInsets.only(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15)),
+                      child: TextFormField(
+                          onChanged: (value) => _searchExercises(value),
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(0),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: pbBlack,
+                                size: 20,
+                              ),
+                              prefixIconConstraints: BoxConstraints(
+                                maxHeight: 20,
+                                maxWidth: 25,
+                              ),
+                              border: InputBorder.none,
+                              hintText: 'Search',
+                              hintStyle: TextStyle(color: pbGrey))),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
                         bottom: 20,
-                        top: 50,
+                        top: 20,
                       ),
-                      child: Text("Exercises",
+                      child: const Text("Exercises",
                           style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w500,
                               color: pbBlack)),
                     ),
-                    if (!exercisesList.isEmpty)
-                      for (Exercise exercise in exercisesList)
-                        ExerciseItem(
-                          exercise: exercise,
-                        )
+                    if (exercisesList.isNotEmpty)
+                      SingleChildScrollView(
+                        child: Column(children: [
+                          for (Exercise exercise in exercisesList)
+                            ExerciseItem(
+                              exercise: exercise,
+                            )
+                        ]),
+                      )
                     else
-                      Column(children: [
+                      const Column(children: [
                         Center(
                           child: Icon(Icons.sentiment_very_dissatisfied,
                               size: 128, color: pbGrey),
@@ -154,7 +187,7 @@ class _Exercises extends State<Exercises> {
             await showAddExerciseDialog(context);
             setState(() {});
           },
-          child: Icon(Icons.add)),
+          child: const Icon(Icons.add)),
     );
   }
 }
