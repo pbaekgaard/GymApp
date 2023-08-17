@@ -13,6 +13,7 @@ class Exercises extends StatefulWidget {
 
 class _Exercises extends State<Exercises> {
   late List<Exercise> exercisesList;
+  late List<Exercise> filteredExercises = exercisesList;
   final _exerciseController = TextEditingController();
   final _weightController = TextEditingController();
   bool isLoading = false;
@@ -31,9 +32,14 @@ class _Exercises extends State<Exercises> {
       results = exercisesList;
     } else {
       results = exercisesList
-          .where((item) => item.exerciseText!.toLowerCase().contains(value))
+          .where((item) =>
+              item.exerciseText!.toLowerCase().contains(value.toLowerCase()))
           .toList();
     }
+
+    setState(() {
+      filteredExercises = results;
+    });
   }
 
   Future refreshExercises() async {
@@ -134,7 +140,7 @@ class _Exercises extends State<Exercises> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(15)),
                       child: TextFormField(
-                          onChanged: (value) => _searchExercises(value),
+                          onChanged: (value) => searchExercises(value),
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(0),
                               prefixIcon: Icon(
@@ -161,10 +167,10 @@ class _Exercises extends State<Exercises> {
                               fontWeight: FontWeight.w500,
                               color: pbBlack)),
                     ),
-                    if (exercisesList.isNotEmpty)
+                    if (filteredExercises.isNotEmpty)
                       SingleChildScrollView(
                         child: Column(children: [
-                          for (Exercise exercise in exercisesList)
+                          for (Exercise exercise in filteredExercises)
                             ExerciseItem(
                               exercise: exercise,
                             )
