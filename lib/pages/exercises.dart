@@ -22,7 +22,6 @@ class _Exercises extends State<Exercises> {
   @override
   void initState() {
     super.initState();
-
     refreshExercises();
   }
 
@@ -110,8 +109,7 @@ class _Exercises extends State<Exercises> {
                             ]);
                         await ExerciseDatabase.instance
                             .addExercise(newExercise);
-                        exercisesList =
-                            await ExerciseDatabase.instance.readAllExercises();
+                        exercisesList.add(newExercise);
                         _weightController.clear();
                         _exerciseController.clear();
                         setState(() => (exercisesList = exercisesList));
@@ -168,16 +166,13 @@ class _Exercises extends State<Exercises> {
                               color: pbBlack)),
                     ),
                     if (filteredExercises.isNotEmpty)
-                      SingleChildScrollView(
-                        child: Column(children: [
-                          for (Exercise exercise in filteredExercises)
-                            ExerciseItem(
-                              exercise: exercise,
-                            )
-                        ]),
-                      )
+                      for (Exercise exercise in filteredExercises)
+                        ExerciseItem(
+                          key: Key(exercise.id.toString()),
+                          exercise: exercise,
+                        )
                     else
-                      const Column(children: [
+                      Column(children: [
                         Center(
                           child: Icon(Icons.sentiment_very_dissatisfied,
                               size: 128, color: pbGrey),
@@ -185,7 +180,7 @@ class _Exercises extends State<Exercises> {
                         Center(
                             child: Text("No exercises added.",
                                 style: TextStyle(color: pbBlack))),
-                      ])
+                      ]),
                   ],
                 )),
       floatingActionButton: FloatingActionButton(
