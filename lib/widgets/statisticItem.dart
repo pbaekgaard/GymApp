@@ -25,7 +25,7 @@ class _StatisticsItem extends State<StatisticsItem> {
   }
 
   Future refreshExercises() async {
-    exercisesList = await ExerciseDatabase.instance.readAllExercises();
+    exercisesList = await AppDatabase.instance.readAllExercises();
 
     setState(() {});
   }

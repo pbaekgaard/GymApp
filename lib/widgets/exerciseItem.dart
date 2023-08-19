@@ -26,7 +26,7 @@ class _ExerciseItem extends State<ExerciseItem> {
   }
 
   Future refreshExercises() async {
-    exercisesList = await ExerciseDatabase.instance.readAllExercises();
+    exercisesList = await AppDatabase.instance.readAllExercises();
   }
 
   Future<void> showUpdateExerciseDialog(BuildContext context) async {
@@ -45,6 +45,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                       TextFormField(
                           keyboardType: TextInputType.number,
                           controller: _weightController,
+                          autofocus: true,
                           validator: (value) {
                             if (value!.isNotEmpty) {
                               return null;
@@ -76,8 +77,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                         exercisesList[exercisesList.indexWhere(
                                 (element) => element.id == exercise.id)] =
                             updatedExercise;
-                        ExerciseDatabase.instance
-                            .updateExercise(updatedExercise);
+                        AppDatabase.instance.updateExercise(updatedExercise);
                         setState(() => ());
                         Navigator.of(context).pop();
                       }
@@ -139,7 +139,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                 );
                 await snackbarController.closed;
                 if (delete) {
-                  await ExerciseDatabase.instance.removeExercise(exercise);
+                  await AppDatabase.instance.removeExercise(exercise);
                 }
               }
               setState(() => {});
@@ -167,8 +167,17 @@ class _ExerciseItem extends State<ExerciseItem> {
               borderRadius: BorderRadius.circular(15),
             ),
             tileColor: Colors.white,
-            title: Text(exercise.exerciseText,
-                style: const TextStyle(color: pbBlack)),
+            title: Wrap(children: [
+              Text(exercise.exerciseText,
+                  style: const TextStyle(color: pbBlack)),
+              Text(
+                "(" + exercise.gym! + ")",
+                style: TextStyle(
+                  color: pbRed,
+                  fontSize: 12,
+                ),
+              ),
+            ]),
             trailing: Wrap(children: [
               Text("${exercise.weights.last}kg",
                   style: TextStyle(

@@ -3,6 +3,7 @@ import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/widgets/exerciseItem.dart';
 import 'package:gymapp/db/databaseHandler.dart';
+import 'package:gymapp/models/gym.dart';
 
 class Exercises extends StatefulWidget {
   const Exercises({Key? key}) : super(key: key);
@@ -14,7 +15,9 @@ class Exercises extends StatefulWidget {
 class _Exercises extends State<Exercises> {
   late List<Exercise> exercisesList;
   late List<Exercise> filteredExercises = exercisesList;
-  final _exerciseController = TextEditingController();
+  late List<Gym> gymList;
+  String addExerciseGymSelection = '';
+  final _exerciseNameController = TextEditingController();
   final _weightController = TextEditingController();
   bool isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -22,7 +25,7 @@ class _Exercises extends State<Exercises> {
   @override
   void initState() {
     super.initState();
-    refreshExercises();
+    fetchDB();
   }
 
   void searchExercises(String value) {
@@ -41,10 +44,10 @@ class _Exercises extends State<Exercises> {
     });
   }
 
-  Future refreshExercises() async {
+  Future fetchDB() async {
     setState(() => isLoading = true);
-
-    exercisesList = await ExerciseDatabase.instance.readAllExercises();
+    exercisesList = await AppDatabase.instance.readAllExercises();
+    gymList = await AppDatabase.instance.getGyms();
     setState(() => isLoading = false);
   }
 
@@ -54,13 +57,15 @@ class _Exercises extends State<Exercises> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
+                scrollable: true,
                 content: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
-                        controller: _exerciseController,
+                        controller: _exerciseNameController,
+                        autofocus: true,
                         validator: (value) {
                           if (value!.isNotEmpty) {
                             if (!value.contains(RegExp(r'[a-zA-Z]'))) {
@@ -91,6 +96,21 @@ class _Exercises extends State<Exercises> {
                           },
                           decoration:
                               const InputDecoration(hintText: "Weight")),
+                      DropdownButton(
+                        value: addExerciseGymSelection,
+                        items: gymList.map((item) {
+                          return DropdownMenuItem(
+                            value: item.gymName,
+                            child: new Text(item.gymName),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          // This is called when the user selects an item.
+                          setState(() {
+                            addExerciseGymSelection = value!;
+                          });
+                        },
+                      )
                     ],
                   ),
                 ),
@@ -100,18 +120,21 @@ class _Exercises extends State<Exercises> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         Exercise newExercise = Exercise(
-                            exerciseText: _exerciseController.text,
-                            weights: [
-                              double.parse(_weightController.text),
-                            ],
-                            updateDates: [
-                              DateTime.now().toString().substring(0, 10),
-                            ]);
-                        await ExerciseDatabase.instance
-                            .addExercise(newExercise);
+                          exerciseText: _exerciseNameController.text,
+                          weights: [
+                            double.parse(_weightController.text),
+                          ],
+                          updateDates: [
+                            DateTime.now().toString().substring(0, 10),
+                          ],
+                          gym: addExerciseGymSelection == 'No Gym Added'
+                              ? null
+                              : addExerciseGymSelection,
+                        );
+                        await AppDatabase.instance.addExercise(newExercise);
                         exercisesList.add(newExercise);
                         _weightController.clear();
-                        _exerciseController.clear();
+                        _exerciseNameController.clear();
                         setState(() => (exercisesList = exercisesList));
                         Navigator.of(context).pop();
                       }
@@ -133,13 +156,13 @@ class _Exercises extends State<Exercises> {
                   padding: const EdgeInsets.only(bottom: 72),
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(15)),
                       child: TextFormField(
                           onChanged: (value) => searchExercises(value),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                               contentPadding: EdgeInsets.all(0),
                               prefixIcon: Icon(
                                 Icons.search,
@@ -172,7 +195,7 @@ class _Exercises extends State<Exercises> {
                           exercise: exercise,
                         )
                     else
-                      Column(children: [
+                      const Column(children: [
                         Center(
                           child: Icon(Icons.sentiment_very_dissatisfied,
                               size: 128, color: pbGrey),
@@ -185,6 +208,9 @@ class _Exercises extends State<Exercises> {
                 )),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
+            print(gymList);
+            addExerciseGymSelection =
+                gymList.isEmpty ? "No Gym Added" : gymList.first.gymName;
             await showAddExerciseDialog(context);
             setState(() {});
           },

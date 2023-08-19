@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
 import 'constants/colors.dart';
