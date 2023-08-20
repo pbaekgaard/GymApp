@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
+import 'package:gymapp/pages/settings.dart';
 import 'package:gymapp/widgets/exerciseItem.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:gymapp/models/gym.dart';
@@ -9,7 +10,7 @@ class Exercises extends StatefulWidget {
   const Exercises({Key? key}) : super(key: key);
 
   @override
-  _Exercises createState() => _Exercises();
+  State<Exercises> createState() => _Exercises();
 }
 
 class _Exercises extends State<Exercises> {
@@ -35,7 +36,7 @@ class _Exercises extends State<Exercises> {
     } else {
       results = exercisesList
           .where((item) =>
-              item.exerciseText!.toLowerCase().contains(value.toLowerCase()))
+              item.exerciseText.toLowerCase().contains(value.toLowerCase()))
           .toList();
     }
 
@@ -44,9 +45,17 @@ class _Exercises extends State<Exercises> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fetchDB();
+  }
+
   Future fetchDB() async {
     setState(() => isLoading = true);
+    // Gym mockGym = new Gym(gymName: "gymName");
     exercisesList = await AppDatabase.instance.readAllExercises();
+    // await AppDatabase.instance.addGym(mockGym);
     gymList = await AppDatabase.instance.getGyms();
     setState(() => isLoading = false);
   }
@@ -66,6 +75,8 @@ class _Exercises extends State<Exercises> {
                       TextFormField(
                         controller: _exerciseNameController,
                         autofocus: true,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onBackground),
                         validator: (value) {
                           if (value!.isNotEmpty) {
                             if (!value.contains(RegExp(r'[a-zA-Z]'))) {
@@ -81,12 +92,20 @@ class _Exercises extends State<Exercises> {
                             return "Invalid Input";
                           }
                         },
-                        decoration:
-                            const InputDecoration(hintText: "Exercise Name"),
+                        decoration: const InputDecoration(
+                            hintText: "e.g: Chest Press",
+                            hintStyle: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12),
+                            labelText: "Exercise:"),
                       ),
                       TextFormField(
                           keyboardType: TextInputType.number,
                           controller: _weightController,
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground),
                           validator: (value) {
                             if (value!.isNotEmpty) {
                               return null;
@@ -94,14 +113,32 @@ class _Exercises extends State<Exercises> {
                               return "Please specify a weight";
                             }
                           },
-                          decoration:
-                              const InputDecoration(hintText: "Weight")),
-                      DropdownButton(
+                          decoration: const InputDecoration(
+                              hintText: "How did you do?",
+                              hintStyle: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12),
+                              labelText: "Weight: ")),
+                      DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 20),
+                          labelText: "Gym: ",
+                          labelStyle: TextStyle(fontSize: 20),
+                          hintStyle: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12),
+                        ),
                         value: addExerciseGymSelection,
+                        disabledHint: const Text(
+                          "No Gym's Available",
+                          style: TextStyle(fontSize: 14),
+                        ),
                         items: gymList.map((item) {
                           return DropdownMenuItem(
                             value: item.gymName,
-                            child: new Text(item.gymName),
+                            child: Text(item.gymName),
                           );
                         }).toList(),
                         onChanged: (String? value) {
@@ -110,7 +147,7 @@ class _Exercises extends State<Exercises> {
                             addExerciseGymSelection = value!;
                           });
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -128,14 +165,13 @@ class _Exercises extends State<Exercises> {
                             DateTime.now().toString().substring(0, 10),
                           ],
                           gym: addExerciseGymSelection == 'No Gym Added'
-                              ? null
+                              ? ""
                               : addExerciseGymSelection,
                         );
                         await AppDatabase.instance.addExercise(newExercise);
                         exercisesList.add(newExercise);
                         _weightController.clear();
                         _exerciseNameController.clear();
-                        setState(() => (exercisesList = exercisesList));
                         Navigator.of(context).pop();
                       }
                     },
@@ -148,7 +184,34 @@ class _Exercises extends State<Exercises> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: pbBG,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+        elevation: 0,
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.background,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        centerTitle: true,
+        title: Text("Overload",
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Settings()));
+              await fetchDB();
+              setState(() {});
+            },
+            icon: Icon(
+              Icons.settings,
+              size: 28,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+          ),
+        ],
+      ),
       body: Container(
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -156,37 +219,44 @@ class _Exercises extends State<Exercises> {
                   padding: const EdgeInsets.only(bottom: 72),
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: TextFormField(
-                          onChanged: (value) => searchExercises(value),
-                          decoration: const InputDecoration(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: TextFormField(
+                            onChanged: (value) => searchExercises(value),
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onBackground),
+                            decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(0),
                               prefixIcon: Icon(
                                 Icons.search,
-                                color: pbBlack,
+                                color:
+                                    Theme.of(context).colorScheme.onBackground,
                                 size: 20,
                               ),
-                              prefixIconConstraints: BoxConstraints(
+                              prefixIconConstraints: const BoxConstraints(
                                 maxHeight: 20,
                                 maxWidth: 25,
                               ),
                               border: InputBorder.none,
                               hintText: 'Search',
-                              hintStyle: TextStyle(color: pbGrey))),
-                    ),
+                              hintStyle: TextStyle(color: pbGrey),
+                            ))),
                     Container(
                       margin: const EdgeInsets.only(
                         bottom: 20,
                         top: 20,
                       ),
-                      child: const Text("Exercises",
+                      child: Text("Exercises",
                           style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w500,
-                              color: pbBlack)),
+                              color:
+                                  Theme.of(context).colorScheme.onBackground)),
                     ),
                     if (filteredExercises.isNotEmpty)
                       for (Exercise exercise in filteredExercises)
@@ -195,20 +265,22 @@ class _Exercises extends State<Exercises> {
                           exercise: exercise,
                         )
                     else
-                      const Column(children: [
+                      Column(children: [
                         Center(
                           child: Icon(Icons.sentiment_very_dissatisfied,
                               size: 128, color: pbGrey),
                         ),
                         Center(
                             child: Text("No exercises added.",
-                                style: TextStyle(color: pbBlack))),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground))),
                       ]),
                   ],
                 )),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            print(gymList);
             addExerciseGymSelection =
                 gymList.isEmpty ? "No Gym Added" : gymList.first.gymName;
             await showAddExerciseDialog(context);

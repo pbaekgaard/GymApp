@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 
@@ -13,7 +15,7 @@ class ExerciseStatItem extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ExerciseStatItemState createState() => _ExerciseStatItemState(
+  State<ExerciseStatItem> createState() => _ExerciseStatItemState(
       weight: weight, previousWeight: previousWeight, entryDate: entryDate);
 }
 
@@ -22,10 +24,7 @@ class _ExerciseStatItemState extends State<ExerciseStatItem> {
   final String? previousWeight;
   final String entryDate;
   _ExerciseStatItemState(
-      {Key? key,
-      required this.weight,
-      this.previousWeight,
-      required this.entryDate});
+      {required this.weight, this.previousWeight, required this.entryDate});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +32,7 @@ class _ExerciseStatItemState extends State<ExerciseStatItem> {
         margin: const EdgeInsets.only(bottom: 10),
         alignment: Alignment.center,
         child: ListTile(
-          visualDensity: VisualDensity(vertical: 3),
+          visualDensity: const VisualDensity(vertical: 3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

@@ -6,6 +6,7 @@ class ExerciseFields {
   static const String weights = 'weights';
   static const String updateDates = 'updateDates';
   static const String gym = 'gym';
+  static const String gymColor = 'gymColor';
 }
 
 class Exercise {
@@ -14,13 +15,15 @@ class Exercise {
   final List<double> weights;
   final List<String> updateDates;
   final String? gym;
+  final int? gymColor;
 
   const Exercise(
       {this.id,
       required this.exerciseText,
       required this.weights,
       required this.updateDates,
-      required this.gym});
+      this.gym,
+      this.gymColor});
   String get updateDatesString => updateDates.join(',');
   Map<String, Object?> toJson() => {
         ExerciseFields.id: id,
@@ -28,18 +31,19 @@ class Exercise {
         ExerciseFields.weights: weights.join(','),
         ExerciseFields.updateDates: updateDatesString,
         ExerciseFields.gym: gym,
+        ExerciseFields.gymColor: gymColor
       };
 
   static Exercise fromJson(Map<String, Object?> json) => Exercise(
-        id: json[ExerciseFields.id] as int?,
-        exerciseText: json[ExerciseFields.exerciseText] as String,
-        weights: (json['weights'] as String)
-            .split(',')
-            .map((weightStr) => double.parse(weightStr))
-            .toList(),
-        updateDates: (json[ExerciseFields.updateDates] as String).split(','),
-        gym: json[ExerciseFields.gym] as String,
-      );
+      id: json[ExerciseFields.id] as int?,
+      exerciseText: json[ExerciseFields.exerciseText] as String,
+      weights: (json['weights'] as String)
+          .split(',')
+          .map((weightStr) => double.parse(weightStr))
+          .toList(),
+      updateDates: (json[ExerciseFields.updateDates] as String).split(','),
+      gym: json[ExerciseFields.gym] as String?,
+      gymColor: json[ExerciseFields.gymColor] as int?);
 
   Exercise copy({
     int? id,
@@ -47,6 +51,7 @@ class Exercise {
     List<double>? weights,
     List<String>? updateDates,
     String? gym,
+    int? gymColor,
   }) =>
       Exercise(
         id: id ?? this.id,
@@ -54,5 +59,6 @@ class Exercise {
         weights: weights ?? this.weights,
         updateDates: updateDates ?? this.updateDates,
         gym: gym ?? this.gym,
+        gymColor: gymColor ?? this.gymColor,
       );
 }

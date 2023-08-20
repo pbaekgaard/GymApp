@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -31,19 +33,23 @@ class AppDatabase {
     const weightsType = 'TEXT NOT NULL';
     const updateDatesType = 'TEXT NOT NULL';
     const gymNameType = 'TEXT NOT NULL';
-    const exerciseGymType = 'TEXT NOT NULL';
+    const gymColorType = 'INTEGER NOT NULL';
+    const exerciseGymColorType = 'INTEGER';
+    const exerciseGymType = 'TEXT';
     await db.execute('''
     CREATE TABLE $tableExercise (
       ${ExerciseFields.id} $idType,
       ${ExerciseFields.exerciseText} $exerciseTextType,
       ${ExerciseFields.weights} $weightsType,
       ${ExerciseFields.updateDates} $updateDatesType,
-      ${ExerciseFields.gym} $exerciseGymType
+      ${ExerciseFields.gym} $exerciseGymType,
+      ${ExerciseFields.gymColor} $exerciseGymColorType
     )''');
     await db.execute('''
       CREATE TABLE $tableGym (
         ${GymFields.id} $idType,
-        ${GymFields.gymName} $gymNameType
+        ${GymFields.gymName} $gymNameType,
+        ${GymFields.color} $gymColorType
       )
 ''');
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
-import 'constants/colors.dart';
+import 'package:gymapp/pages/settings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,25 +16,31 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Overload',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.light(
+            brightness: Brightness.light,
+            background: Color(0xFFEEEFF5),
+            onBackground: Color(0xFF4a4a4a),
+            secondary: Color(0xFFe91e63),
+            onSecondary: Color(0xFF2a2a2a),
+            primary: Color(0xFFc2185b),
+            secondaryContainer: Color(0xFFFFFFFF),
+            tertiary: Color.fromARGB(255, 50, 197, 55),
+            primaryContainer: Colors.white),
       ),
+      darkTheme: ThemeData.from(
+          colorScheme: ColorScheme.dark(
+        brightness: Brightness.dark,
+        background: Color(0xFF2a2a2a),
+        onBackground: Color(0xFFFFFFFF),
+        secondary: Color(0xFFe91e63),
+        onSecondary: Color(0xFF2a2a2a),
+        secondaryContainer: Color(0xFF444444),
+        primary: Color(0xFFe91e63),
+        primaryContainer: Color(0xFF3f3f3f),
+        tertiary: Color.fromARGB(255, 50, 197, 55),
+      )),
+      themeMode: ThemeMode.dark,
       home: const MyHomePage(title: 'Overload'),
     );
   }
@@ -80,17 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      backgroundColor: pbBG,
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: pbBG,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(
-            child: Text(widget.title, style: const TextStyle(color: pbBlack))),
-      ),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         child: _pages[_selectedIndex],

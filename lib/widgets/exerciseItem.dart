@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -8,15 +9,15 @@ class ExerciseItem extends StatefulWidget {
   const ExerciseItem({Key? key, required this.exercise}) : super(key: key);
 
   @override
-  _ExerciseItem createState() => _ExerciseItem(exercise: exercise);
+  State<ExerciseItem> createState() => _ExerciseItem(exercise: exercise);
 }
 
 class _ExerciseItem extends State<ExerciseItem> {
   late List<Exercise> exercisesList;
   final _weightController = TextEditingController();
   final Exercise exercise;
-  _ExerciseItem({Key? key, required this.exercise});
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  _ExerciseItem({required this.exercise});
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -95,9 +96,10 @@ class _ExerciseItem extends State<ExerciseItem> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-                title: Icon(Icons.delete, size: 32),
-                contentTextStyle: TextStyle(color: pbBlack, fontSize: 16),
-                content: Text("Are you sure you want to delete this exercise?"),
+                title: const Icon(Icons.delete, size: 32),
+                contentTextStyle: const TextStyle(color: pbBlack, fontSize: 16),
+                content: const Text(
+                    "Are you sure you want to delete this exercise?"),
                 actions: <Widget>[
                   TextButton(
                     child: const Text("Yes, remove it!"),
@@ -134,7 +136,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                     content: Text('Deleted ${exercise.exerciseText}'),
                     action: SnackBarAction(
                         label: 'Undo', onPressed: () => delete = false),
-                    duration: Duration(seconds: 3),
+                    duration: const Duration(seconds: 3),
                   ),
                 );
                 await snackbarController.closed;
@@ -147,36 +149,49 @@ class _ExerciseItem extends State<ExerciseItem> {
             }
           },
           background: Container(
-            child: Icon(Icons.delete, color: Colors.white),
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: pbRed,
+              color: Theme.of(context).colorScheme.secondary,
             ),
+            child: const Row(children: [
+              Icon(Icons.delete, color: Colors.white),
+              Text(
+                "Remove",
+                style: TextStyle(color: Colors.white),
+              )
+            ]),
           ),
           secondaryBackground: Container(
-            child: Icon(Icons.edit, color: Colors.white),
             alignment: Alignment.centerRight,
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-                color: Colors.green, borderRadius: BorderRadius.circular(15)),
+                color: Theme.of(context).colorScheme.tertiary,
+                borderRadius: BorderRadius.circular(15)),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Edit ",
+                  style: TextStyle(color: Colors.white),
+                ),
+                Icon(Icons.edit, color: Colors.white)
+              ],
+            ),
           ),
           child: ListTile(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).colorScheme.primaryContainer,
             title: Wrap(children: [
               Text(exercise.exerciseText,
-                  style: const TextStyle(color: pbBlack)),
-              Text(
-                "(" + exercise.gym! + ")",
-                style: TextStyle(
-                  color: pbRed,
-                  fontSize: 12,
-                ),
-              ),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onBackground)),
+              if (!(exercise.gym == ""))
+                Text("${exercise.gym}",
+                    style: TextStyle(color: Color(exercise.gymColor!)))
             ]),
             trailing: Wrap(children: [
               Text("${exercise.weights.last}kg",
@@ -188,9 +203,9 @@ class _ExerciseItem extends State<ExerciseItem> {
                               : exercise.weights.last ==
                                       exercise
                                           .weights[exercise.weights.length - 2]
-                                  ? pbBlack
-                                  : pbRed)
-                          : pbBlack)),
+                                  ? Theme.of(context).colorScheme.onBackground
+                                  : Theme.of(context).colorScheme.secondary)
+                          : Theme.of(context).colorScheme.onBackground)),
               exercise.weights.length > 1
                   ? (exercise.weights.last >
                           exercise.weights[exercise.weights.length - 2]
@@ -198,11 +213,15 @@ class _ExerciseItem extends State<ExerciseItem> {
                           size: 20, color: Colors.green)
                       : exercise.weights.last ==
                               exercise.weights[exercise.weights.length - 2]
-                          ? const Icon(Icons.trending_neutral,
-                              size: 20, color: pbBlack)
-                          : const Icon(Icons.trending_down,
-                              size: 20, color: pbRed))
-                  : const Icon(Icons.trending_neutral, size: 20, color: pbBlack)
+                          ? Icon(Icons.trending_neutral,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.onBackground)
+                          : Icon(Icons.trending_down,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.secondary))
+                  : Icon(Icons.trending_neutral,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onBackground)
             ]),
           )),
     );

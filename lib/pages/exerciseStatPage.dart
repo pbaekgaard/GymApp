@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 import 'package:gymapp/models/exercise.dart';
@@ -10,23 +12,13 @@ class ExerciseStatPage extends StatefulWidget {
   const ExerciseStatPage({Key? key, required this.exercise}) : super(key: key);
 
   @override
-  _ExerciseStatPageState createState() =>
+  State<ExerciseStatPage> createState() =>
       _ExerciseStatPageState(exercise: exercise);
-}
-
-class entryObject {
-  final double weight;
-  final String entryDate;
-
-  const entryObject({
-    required this.weight,
-    required this.entryDate,
-  });
 }
 
 class _ExerciseStatPageState extends State<ExerciseStatPage> {
   final Exercise exercise;
-  _ExerciseStatPageState({Key? key, required this.exercise});
+  _ExerciseStatPageState({required this.exercise});
 
   @override
   Widget build(BuildContext context) {
