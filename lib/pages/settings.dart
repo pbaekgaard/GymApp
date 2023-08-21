@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gymapp/constants/themes.dart';
 
 import '../models/gym.dart';
 
@@ -13,7 +16,7 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  String? themeMode = "dark";
+  late String? themeMode;
   bool isLoading = false;
   late List<Gym> gymList;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -27,7 +30,7 @@ class _SettingsState extends State<Settings> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
   }
 
@@ -36,6 +39,7 @@ class _SettingsState extends State<Settings> {
       isLoading = true;
     });
     gymList = await AppDatabase.instance.getGyms();
+    print(themeMode);
     setState(
       () => isLoading = false,
     );
@@ -139,190 +143,218 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-            iconTheme:
-                IconThemeData(color: Theme.of(context).colorScheme.secondary),
-            elevation: 0,
-            // TRY THIS: Try changing the color here to a specific color (to
-            // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-            // change color while the other colors stay the same.
-            backgroundColor: Theme.of(context).colorScheme.background,
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
-            centerTitle: true,
-            title: Text("Preferences",
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        body: SingleChildScrollView(
-          child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Column(
-                children: [
-                  Container(
-                      child: Column(
-                    children: [
-                      Container(
-                        alignment: Alignment.topLeft,
-                        margin: const EdgeInsets.only(
-                          bottom: 20,
-                          top: 20,
-                        ),
-                        child: Text("Theme Mode",
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onBackground)),
-                      ),
-                      RadioListTile(
-                          title: Row(children: [
-                            Icon(Symbols.night_sight_auto),
-                            Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: Text("Follow system"),
-                            )
-                          ]),
-                          contentPadding: EdgeInsets.all(0),
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          value: 'system',
-                          groupValue: themeMode,
-                          onChanged: (String? value) {
-                            setState(() {
-                              themeMode = value;
-                            });
-                            ;
-                          }),
-                      RadioListTile(
-                          title: Row(children: [
-                            Icon(Symbols.dark_mode),
-                            Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: Text("Dark mode"),
-                            )
-                          ]),
-                          contentPadding: EdgeInsets.all(0),
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          value: 'dark',
-                          groupValue: themeMode,
-                          onChanged: (String? value) {
-                            setState(() {
-                              themeMode = value;
-                            });
-                            ;
-                          }),
-                      RadioListTile(
-                          title: Row(children: [
-                            Icon(Symbols.light_mode),
-                            Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: Text("Light mode"),
-                            )
-                          ]),
-                          contentPadding: EdgeInsets.all(0),
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          value: 'light',
-                          groupValue: themeMode,
-                          onChanged: (String? value) {
-                            setState(() {
-                              themeMode = value;
-                            });
-                            ;
-                          }),
-                    ],
-                  )),
-                  Container(
-                      child: Column(
-                    children: [
-                      Container(
-                        alignment: Alignment.topLeft,
-                        margin: const EdgeInsets.only(
-                          bottom: 20,
-                          top: 20,
-                        ),
-                        child: Text("Gyms",
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onBackground)),
-                      ),
-                      isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              children: [
-                                if (gymList.isNotEmpty)
-                                  for (Gym gym in gymList)
-                                    Container(
-                                        margin: EdgeInsets.only(bottom: 8),
-                                        padding: EdgeInsets.all(15),
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryContainer,
-                                            borderRadius:
-                                                BorderRadius.circular(15)),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text("${gym.gymName}"),
-                                            Row(
-                                              children: [
-                                                Text("Color:"),
-                                                Icon(
-                                                  Icons.stop,
-                                                  color: Color(gym.color),
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        )),
-                                // Container(
-                                //     padding: EdgeInsets.all(15),
-                                //     width: MediaQuery.of(context).size.width,
-                                //     decoration: BoxDecoration(
-                                //         color: Theme.of(context)
-                                //             .colorScheme
-                                //             .secondaryContainer,
-                                //         borderRadius: BorderRadius.circular(15)),
-                                //     child: Icon(
-                                //       Icons.add,
-                                //       color:
-                                //           Theme.of(context).colorScheme.secondary,
-                                //     )),
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  child: TextButton(
-                                    onPressed: () async {
-                                      await addGymDialog(context);
-                                      setState(() {
-                                        gymList = gymList;
-                                      });
-                                    },
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .secondaryContainer,
-                                    ),
-                                    child: Icon(
-                                      Icons.add,
+    return Consumer<ThemeService>(builder: (context, ThemeService theme, _) {
+      themeMode = theme.mode;
+      return isLoading
+          ? Center(
+              child: const CircularProgressIndicator(),
+            )
+          : Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.background,
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                  iconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.secondary),
+                  elevation: 0,
+                  // TRY THIS: Try changing the color here to a specific color (to
+                  // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+                  // change color while the other colors stay the same.
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  // Here we take the value from the MyHomePage object that was created by
+                  // the App.build method, and use it to set our appbar title.
+                  centerTitle: true,
+                  title: Text("Preferences",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary))),
+              body: SingleChildScrollView(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    child: Column(
+                      children: [
+                        Container(
+                            child: Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.topLeft,
+                              margin: const EdgeInsets.only(
+                                bottom: 20,
+                                top: 20,
+                              ),
+                              child: Text("Theme Mode",
+                                  style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w500,
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .secondary,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )
-                    ],
-                  )),
-                ],
-              )),
-        ));
+                                          .onBackground)),
+                            ),
+                            Consumer<ThemeService>(
+                                builder: (context, ThemeService theme, _) {
+                              return RadioListTile(
+                                  title: Row(children: [
+                                    Icon(Symbols.night_sight_auto),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8),
+                                      child: Text("Follow system"),
+                                    )
+                                  ]),
+                                  contentPadding: EdgeInsets.all(0),
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  value: 'system',
+                                  groupValue: themeMode,
+                                  onChanged: (String? value) async {
+                                    theme.setTheme(value!);
+                                    setState(() {
+                                      themeMode = value;
+                                    });
+                                    ;
+                                  });
+                            }),
+                            Consumer<ThemeService>(
+                                builder: (context, ThemeService theme, _) {
+                              return RadioListTile(
+                                  title: Row(children: [
+                                    Icon(Symbols.dark_mode),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8),
+                                      child: Text("Dark mode"),
+                                    )
+                                  ]),
+                                  contentPadding: EdgeInsets.all(0),
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  value: 'dark',
+                                  groupValue: themeMode,
+                                  onChanged: (String? value) async {
+                                    theme.setTheme(value!);
+                                    setState(() {
+                                      themeMode = value;
+                                    });
+                                    ;
+                                  });
+                            }),
+                            Consumer<ThemeService>(
+                                builder: (context, ThemeService theme, _) {
+                              return RadioListTile(
+                                  title: Row(children: [
+                                    Icon(Symbols.light_mode),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8),
+                                      child: Text("Light mode"),
+                                    )
+                                  ]),
+                                  contentPadding: EdgeInsets.all(0),
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  value: 'light',
+                                  groupValue: themeMode,
+                                  onChanged: (String? value) async {
+                                    theme.setTheme(value!);
+                                    setState(() {
+                                      themeMode = value;
+                                    });
+                                    ;
+                                  });
+                            }),
+                          ],
+                        )),
+                        Container(
+                            child: Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.topLeft,
+                              margin: const EdgeInsets.only(
+                                bottom: 20,
+                                top: 20,
+                              ),
+                              child: Text("Gyms",
+                                  style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground)),
+                            ),
+                            isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : Column(
+                                    children: [
+                                      if (gymList.isNotEmpty)
+                                        for (Gym gym in gymList)
+                                          Container(
+                                              margin:
+                                                  EdgeInsets.only(bottom: 8),
+                                              padding: EdgeInsets.all(15),
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondaryContainer,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text("${gym.gymName}"),
+                                                  Row(
+                                                    children: [
+                                                      Text("Color:"),
+                                                      Icon(
+                                                        Icons.stop,
+                                                        color: Color(gym.color),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              )),
+                                      // Container(
+                                      //     padding: EdgeInsets.all(15),
+                                      //     width: MediaQuery.of(context).size.width,
+                                      //     decoration: BoxDecoration(
+                                      //         color: Theme.of(context)
+                                      //             .colorScheme
+                                      //             .secondaryContainer,
+                                      //         borderRadius: BorderRadius.circular(15)),
+                                      //     child: Icon(
+                                      //       Icons.add,
+                                      //       color:
+                                      //           Theme.of(context).colorScheme.secondary,
+                                      //     )),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            await addGymDialog(context);
+                                            setState(() {
+                                              gymList = gymList;
+                                            });
+                                          },
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .secondaryContainer,
+                                          ),
+                                          child: Icon(
+                                            Icons.add,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                          ],
+                        )),
+                      ],
+                    )),
+              ));
+    });
   }
 }

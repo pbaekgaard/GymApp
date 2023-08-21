@@ -1,46 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gymapp/constants/themes.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  MyApp({super.key});
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Overload',
-      theme: ThemeData.from(
-        colorScheme: const ColorScheme.light(
-            brightness: Brightness.light,
-            background: Color(0xFFEEEFF5),
-            onBackground: Color(0xFF4a4a4a),
-            secondary: Color(0xFFe91e63),
-            onSecondary: Color(0xFF2a2a2a),
-            primary: Color(0xFFc2185b),
-            secondaryContainer: Color(0xFFFFFFFF),
-            tertiary: Color.fromARGB(255, 50, 197, 55),
-            primaryContainer: Colors.white),
-      ),
-      darkTheme: ThemeData.from(
-          colorScheme: const ColorScheme.dark(
-        brightness: Brightness.dark,
-        background: Color(0xFF2a2a2a),
-        onBackground: Color(0xFFFFFFFF),
-        secondary: Color(0xFFe91e63),
-        onSecondary: Color(0xFF2a2a2a),
-        secondaryContainer: Color(0xFF444444),
-        primary: Color(0xFFe91e63),
-        primaryContainer: Color(0xFF3f3f3f),
-        tertiary: Color.fromARGB(255, 50, 197, 55),
-      )),
-      themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Overload'),
+    return ChangeNotifierProvider<ThemeService>(
+      create: (context) => ThemeService(),
+      child: Consumer(builder: (context, ThemeService theme, _) {
+        return MaterialApp(
+          title: 'Overload',
+          theme: light,
+          darkTheme: dark,
+          themeMode: theme.mode == 'system'
+              ? ThemeMode.system
+              : theme.mode == 'dark'
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
+          home: const MyHomePage(title: 'Overload'),
+        );
+      }),
     );
   }
 }

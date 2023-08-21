@@ -81,10 +81,15 @@ class _Exercises extends State<Exercises> {
                           if (value!.isNotEmpty) {
                             if (!value.contains(RegExp(r'[a-zA-Z]'))) {
                               return "Exercise title must contain at least one alphabetical character.";
-                            } else if (exercisesList
-                                .map((e) => e.exerciseText)
-                                .contains(value)) {
-                              return "This exercise already exists";
+                            } else if (exercisesList[exercisesList.indexWhere(
+                                            (element) =>
+                                                element.exerciseText == value)]
+                                        .gym ==
+                                    addExerciseGymSelection &&
+                                exercisesList
+                                    .map((e) => e.exerciseText)
+                                    .contains(value)) {
+                              return "This exercise already exists for this gym!";
                             } else {
                               return null;
                             }
@@ -164,6 +169,12 @@ class _Exercises extends State<Exercises> {
                             updateDates: [
                               DateTime.now().toString().substring(0, 10),
                             ],
+                            gymColor: addExerciseGymSelection == 'No Gym Added'
+                                ? 0
+                                : gymList[gymList.indexWhere((element) =>
+                                        element.gymName ==
+                                        addExerciseGymSelection)]
+                                    .color,
                             gym: addExerciseGymSelection == 'No Gym Added'
                                 ? ""
                                 : addExerciseGymSelection,
@@ -173,6 +184,7 @@ class _Exercises extends State<Exercises> {
                         exercisesList.add(newExercise);
                         _weightController.clear();
                         _exerciseNameController.clear();
+                        setState(() => {});
                         Navigator.of(context).pop();
                       }
                     },

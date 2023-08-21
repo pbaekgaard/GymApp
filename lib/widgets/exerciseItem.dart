@@ -1,5 +1,8 @@
 // ignore_for_file: file_names
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
@@ -190,12 +193,22 @@ class _ExerciseItem extends State<ExerciseItem> {
               Text(exercise.exerciseText,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onBackground)),
-              if (!(exercise.gym == ""))
-                Text("${exercise.gym}",
-                    style: TextStyle(color: Color(exercise.gymColor!)))
+              if (exercise.gym != "")
+                Text(
+                  "${exercise.gym}",
+                  style: GoogleFonts.montserrat(
+                    color: Color(exercise.gymColor!),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10,
+                    fontFeatures: [
+                      FontFeature.superscripts(),
+                    ],
+                  ),
+                )
             ]),
             trailing: Wrap(children: [
-              Text("${exercise.weights.last}kg",
+              Text(
+                  "${exercise.weights.last.truncateToDouble() == exercise.weights.last ? exercise.weights.last.toStringAsFixed(0) : num.parse(exercise.weights.last.toString())}kg",
                   style: TextStyle(
                       color: exercise.weights.length > 1
                           ? (exercise.weights.last >

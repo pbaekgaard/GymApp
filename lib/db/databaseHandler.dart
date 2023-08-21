@@ -37,7 +37,7 @@ class AppDatabase {
     const gymNameType = 'TEXT NOT NULL';
     const gymColorType = 'INTEGER NOT NULL';
     const exerciseGymColorType = 'INTEGER';
-    const exerciseGymType = 'TEXT';
+    const exerciseGymType = 'TEXT NOT NULL';
     await db.execute('''
     CREATE TABLE $tableExercise (
       ${ExerciseFields.id} $idType,
