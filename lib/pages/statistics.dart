@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
-import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/widgets/statisticItem.dart';
 
 class Statistics extends StatefulWidget {
@@ -52,13 +51,15 @@ class _StatisticsState extends State<Statistics> {
                       Container(
                         margin: const EdgeInsets.only(
                           bottom: 20,
-                          top: 50,
+                          top: 0,
                         ),
-                        child: const Text("Statistics",
+                        child: Text("Statistics",
                             style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w500,
-                                color: pbBlack)),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onBackground)),
                       ),
                       SingleChildScrollView(
                         child: GridView.count(
