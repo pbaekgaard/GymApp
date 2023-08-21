@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -7,6 +8,7 @@ import 'package:gymapp/pages/settings.dart';
 import 'package:gymapp/widgets/exerciseItem.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:gymapp/models/gym.dart';
+import 'package:collection/collection.dart';
 
 class Exercises extends StatefulWidget {
   const Exercises({Key? key}) : super(key: key);
@@ -22,6 +24,8 @@ class _Exercises extends State<Exercises> {
   String addExerciseGymSelection = '';
   final _exerciseNameController = TextEditingController();
   final _weightController = TextEditingController();
+  final _repsController = TextEditingController();
+  final _searchFormKey = TextEditingController();
   bool isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -50,7 +54,15 @@ class _Exercises extends State<Exercises> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    fetchDB();
+  }
+
+  deleteDismissed(int? exercise) async {
+    await AppDatabase.instance.removeExercise(
+        exercisesList.firstWhere((element) => element.id == exercise));
+    setState(() {
+      exercisesList.remove(
+          exercisesList.firstWhere((element) => element.id == exercise));
+    });
   }
 
   Future fetchDB() async {
@@ -83,21 +95,21 @@ class _Exercises extends State<Exercises> {
                           if (value!.isNotEmpty) {
                             if (!value.contains(RegExp(r'[a-zA-Z]'))) {
                               return "Exercise title must contain at least one alphabetical character.";
-                            } else if (exercisesList[exercisesList.indexWhere(
+                            } else if (exercisesList.isNotEmpty) {
+                              if (exercisesList.firstWhereOrNull((element) =>
+                                      element.exerciseText == value!) !=
+                                  null) {
+                                if (exercisesList[exercisesList.indexWhere(
                                             (element) =>
-                                                element.exerciseText == value)]
+                                                element.exerciseText == value!)]
                                         .gym ==
-                                    addExerciseGymSelection &&
-                                exercisesList
-                                    .map((e) => e.exerciseText)
-                                    .contains(value)) {
-                              return "This exercise already exists for this gym!";
-                            } else {
-                              return null;
+                                    addExerciseGymSelection) {
+                                  return "This exercise already exists for this gym!";
+                                }
+                              }
                             }
-                          } else {
-                            return "Invalid Input";
                           }
+                          return null;
                         },
                         decoration: const InputDecoration(
                             hintText: "e.g: Chest Press",
@@ -127,6 +139,26 @@ class _Exercises extends State<Exercises> {
                                   fontWeight: FontWeight.w400,
                                   fontSize: 12),
                               labelText: "Weight: ")),
+                      TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: _repsController,
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground),
+                          validator: (value) {
+                            if (value!.isNotEmpty) {
+                              return null;
+                            } else {
+                              return "Please specify how many reps";
+                            }
+                          },
+                          decoration: const InputDecoration(
+                              hintText: "How many did you do?",
+                              hintStyle: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12),
+                              labelText: "Reps: ")),
                       DropdownButtonFormField(
                         decoration: const InputDecoration(
                           contentPadding: EdgeInsets.only(top: 20),
@@ -177,16 +209,13 @@ class _Exercises extends State<Exercises> {
                                         element.gymName ==
                                         addExerciseGymSelection)]
                                     .color,
-                            gym: addExerciseGymSelection == 'No Gym Added'
-                                ? ""
-                                : addExerciseGymSelection,
-                            reps: [8],
+                            gym: addExerciseGymSelection,
+                            reps: [int.parse(_repsController.text)],
                             bodyPart: "Chest");
                         await AppDatabase.instance.addExercise(newExercise);
-                        exercisesList.add(newExercise);
                         _weightController.clear();
                         _exerciseNameController.clear();
-                        setState(() => {});
+                        _repsController.clear();
                         Navigator.of(context).pop();
                       }
                     },
@@ -241,6 +270,7 @@ class _Exercises extends State<Exercises> {
                                 .secondaryContainer,
                             borderRadius: BorderRadius.circular(15)),
                         child: TextFormField(
+                            controller: _searchFormKey,
                             onChanged: (value) => searchExercises(value),
                             style: TextStyle(
                                 color:
@@ -276,8 +306,9 @@ class _Exercises extends State<Exercises> {
                     if (filteredExercises.isNotEmpty)
                       for (Exercise exercise in filteredExercises)
                         ExerciseItem(
-                          key: Key(exercise.id.toString()),
+                          key: ValueKey(exercise.id),
                           exercise: exercise,
+                          dismissCallback: () => deleteDismissed(exercise.id),
                         )
                     else
                       Column(children: [
@@ -299,7 +330,9 @@ class _Exercises extends State<Exercises> {
             addExerciseGymSelection =
                 gymList.isEmpty ? "No Gym Added" : gymList.first.gymName;
             await showAddExerciseDialog(context);
-            setState(() {});
+            await fetchDB();
+            searchExercises("");
+            _searchFormKey.clear();
           },
           child: const Icon(Icons.add)),
     );

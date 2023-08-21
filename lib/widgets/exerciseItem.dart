@@ -9,17 +9,26 @@ import 'package:gymapp/db/databaseHandler.dart';
 
 class ExerciseItem extends StatefulWidget {
   final Exercise exercise;
-  const ExerciseItem({Key? key, required this.exercise}) : super(key: key);
+  final Function dismissCallback;
+  const ExerciseItem(
+      {required Key key, required this.exercise, required this.dismissCallback})
+      : super(key: key);
 
   @override
-  State<ExerciseItem> createState() => _ExerciseItem(exercise: exercise);
+  State<ExerciseItem> createState() => _ExerciseItem(
+      key: key!, exercise: exercise, dismissCallback: dismissCallback);
 }
 
 class _ExerciseItem extends State<ExerciseItem> {
   late List<Exercise> exercisesList;
   final _weightController = TextEditingController();
   final Exercise exercise;
-  _ExerciseItem({required this.exercise});
+  final Key key;
+  final Function dismissCallback;
+  _ExerciseItem(
+      {required this.key,
+      required this.exercise,
+      required this.dismissCallback});
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -122,7 +131,7 @@ class _ExerciseItem extends State<ExerciseItem> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
-          key: Key(exercise.id.toString()),
+          key: key,
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.endToStart) {
               await showUpdateExerciseDialog(context);
@@ -138,12 +147,14 @@ class _ExerciseItem extends State<ExerciseItem> {
                     content: Text('Deleted ${exercise.exerciseText}'),
                     action: SnackBarAction(
                         label: 'Undo', onPressed: () => delete = false),
-                    duration: const Duration(seconds: 3),
+                    duration: const Duration(seconds: 1),
                   ),
                 );
                 await snackbarController.closed;
                 if (delete) {
                   await AppDatabase.instance.removeExercise(exercise);
+                  print(exercise.id);
+                  dismissCallback();
                 }
               }
               setState(() => {});
@@ -206,7 +217,7 @@ class _ExerciseItem extends State<ExerciseItem> {
             ]),
             trailing: Wrap(children: [
               Text(
-                  "${exercise.weights.last.truncateToDouble() == exercise.weights.last ? exercise.weights.last.toStringAsFixed(0) : num.parse(exercise.weights.last.toString())}kg",
+                  "${exercise.reps.last}x${exercise.weights.last.truncateToDouble() == exercise.weights.last ? exercise.weights.last.toStringAsFixed(0) : num.parse(exercise.weights.last.toString())}kg",
                   style: TextStyle(
                       color: exercise.weights.length > 1
                           ? (exercise.weights.last >

@@ -39,7 +39,7 @@ class Exercise {
         ExerciseFields.gym: gym,
         ExerciseFields.gymColor: gymColor,
         ExerciseFields.bodyPart: bodyPart,
-        ExerciseFields.reps: reps.join('.')
+        ExerciseFields.reps: reps.join(',')
       };
 
   static Exercise fromJson(Map<String, Object?> json) => Exercise(
@@ -53,7 +53,7 @@ class Exercise {
       gym: json[ExerciseFields.gym] as String?,
       reps: (json['reps'] as String)
           .split(',')
-          .map((repsStr) => int.parse(repsStr))
+          .map((repsString) => int.parse(repsString))
           .toList(),
       bodyPart: json[ExerciseFields.bodyPart] as String,
       gymColor: json[ExerciseFields.gymColor] as int?);

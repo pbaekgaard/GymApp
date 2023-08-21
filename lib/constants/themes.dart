@@ -29,7 +29,7 @@ ThemeData dark = ThemeData.from(
 
 class ThemeService with ChangeNotifier {
   SharedPreferences? prefs;
-  String? mode;
+  String? mode = "system";
   bool? test;
   static String key = "privatekey";
   ThemeService() {
