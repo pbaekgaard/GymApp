@@ -1,7 +1,6 @@
 // ignore_for_file: file_names, no_logic_in_create_state
 
 import 'package:flutter/material.dart';
-import 'package:gymapp/constants/colors.dart';
 
 class ExerciseStatItem extends StatefulWidget {
   final String weight;
@@ -37,21 +36,27 @@ class _ExerciseStatItemState extends State<ExerciseStatItem> {
             borderRadius: BorderRadius.circular(20),
           ),
           tileColor: previousWeight == null
-              ? Colors.white
+              ? Theme.of(context).colorScheme.secondaryContainer
               : double.parse(previousWeight!) < double.parse(weight)
-                  ? Colors.greenAccent
-                  : Colors.redAccent,
-          title: Text(entryDate, style: const TextStyle(color: pbBlack)),
+                  ? Theme.of(context).colorScheme.tertiary
+                  : Theme.of(context).colorScheme.primary,
+          title: Text(entryDate,
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onBackground)),
           trailing: Wrap(children: [
             Text(
               "$weight" "kg",
-              style: const TextStyle(color: pbBlack),
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onBackground),
             ),
             previousWeight == null
-                ? const Icon(Icons.trending_neutral, color: pbBlack)
+                ? Icon(Icons.trending_neutral,
+                    color: Theme.of(context).colorScheme.onBackground)
                 : double.parse(previousWeight!) < double.parse(weight)
-                    ? const Icon(Icons.trending_up, color: pbBlack)
-                    : const Icon(Icons.trending_down, color: pbBlack)
+                    ? Icon(Icons.trending_up,
+                        color: Theme.of(context).colorScheme.onBackground)
+                    : Icon(Icons.trending_down,
+                        color: Theme.of(context).colorScheme.onBackground)
           ]),
         ));
   }

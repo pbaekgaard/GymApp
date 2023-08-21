@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:gymapp/models/exercise.dart';
-import 'package:gymapp/constants/colors.dart';
 
 import 'package:gymapp/widgets/exerciseStatItem.dart';
 
@@ -23,17 +22,21 @@ class _ExerciseStatPageState extends State<ExerciseStatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: pbBG,
+        backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
+            elevation: 0,
+            iconTheme:
+                IconThemeData(color: Theme.of(context).colorScheme.secondary),
             // TRY THIS: Try changing the color here to a specific color (to
             // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
             // change color while the other colors stay the same.
-            backgroundColor: pbBG,
+            backgroundColor: Theme.of(context).colorScheme.background,
             // Here we take the value from the MyHomePage object that was created by
             // the App.build method, and use it to set our appbar title.
             centerTitle: true,
             title: Text(exercise.exerciseText,
-                style: const TextStyle(color: pbBlack))),
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
         body: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
