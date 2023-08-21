@@ -143,6 +143,8 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Theme.of(context).colorScheme.background,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+            iconTheme:
+                IconThemeData(color: Theme.of(context).colorScheme.secondary),
             elevation: 0,
             // TRY THIS: Try changing the color here to a specific color (to
             // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar

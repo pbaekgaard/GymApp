@@ -157,17 +157,18 @@ class _Exercises extends State<Exercises> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         Exercise newExercise = Exercise(
-                          exerciseText: _exerciseNameController.text,
-                          weights: [
-                            double.parse(_weightController.text),
-                          ],
-                          updateDates: [
-                            DateTime.now().toString().substring(0, 10),
-                          ],
-                          gym: addExerciseGymSelection == 'No Gym Added'
-                              ? ""
-                              : addExerciseGymSelection,
-                        );
+                            exerciseText: _exerciseNameController.text,
+                            weights: [
+                              double.parse(_weightController.text),
+                            ],
+                            updateDates: [
+                              DateTime.now().toString().substring(0, 10),
+                            ],
+                            gym: addExerciseGymSelection == 'No Gym Added'
+                                ? ""
+                                : addExerciseGymSelection,
+                            reps: [8],
+                            bodyPart: "Chest");
                         await AppDatabase.instance.addExercise(newExercise);
                         exercisesList.add(newExercise);
                         _weightController.clear();
@@ -207,7 +208,7 @@ class _Exercises extends State<Exercises> {
             icon: Icon(
               Icons.settings,
               size: 28,
-              color: Theme.of(context).colorScheme.onBackground,
+              color: Theme.of(context).colorScheme.secondary,
             ),
           ),
         ],

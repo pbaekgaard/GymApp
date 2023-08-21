@@ -22,7 +22,8 @@ class _ExerciseItem extends State<ExerciseItem> {
   @override
   void initState() {
     super.initState();
-
+    print("bodyPart: " + exercise.bodyPart);
+    print("reps: " + exercise.reps.first.toString());
     refreshExercises();
   }
 

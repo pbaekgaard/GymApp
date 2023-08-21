@@ -31,6 +31,8 @@ class AppDatabase {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const exerciseTextType = 'TEXT NOT NULL';
     const weightsType = 'TEXT NOT NULL';
+    const exerciseRepsType = 'TEXT NOT NULL';
+    const exercisePartType = 'TEXT NOT NULL';
     const updateDatesType = 'TEXT NOT NULL';
     const gymNameType = 'TEXT NOT NULL';
     const gymColorType = 'INTEGER NOT NULL';
@@ -43,7 +45,9 @@ class AppDatabase {
       ${ExerciseFields.weights} $weightsType,
       ${ExerciseFields.updateDates} $updateDatesType,
       ${ExerciseFields.gym} $exerciseGymType,
-      ${ExerciseFields.gymColor} $exerciseGymColorType
+      ${ExerciseFields.gymColor} $exerciseGymColorType,
+      ${ExerciseFields.reps} $exerciseRepsType,
+      ${ExerciseFields.bodyPart} $exercisePartType
     )''');
     await db.execute('''
       CREATE TABLE $tableGym (

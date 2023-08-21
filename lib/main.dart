@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
-import 'package:gymapp/pages/settings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Overload',
       theme: ThemeData.from(
-        colorScheme: ColorScheme.light(
+        colorScheme: const ColorScheme.light(
             brightness: Brightness.light,
             background: Color(0xFFEEEFF5),
             onBackground: Color(0xFF4a4a4a),
@@ -29,7 +28,7 @@ class MyApp extends StatelessWidget {
             primaryContainer: Colors.white),
       ),
       darkTheme: ThemeData.from(
-          colorScheme: ColorScheme.dark(
+          colorScheme: const ColorScheme.dark(
         brightness: Brightness.dark,
         background: Color(0xFF2a2a2a),
         onBackground: Color(0xFFFFFFFF),
@@ -40,7 +39,7 @@ class MyApp extends StatelessWidget {
         primaryContainer: Color(0xFF3f3f3f),
         tertiary: Color.fromARGB(255, 50, 197, 55),
       )),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.system,
       home: const MyHomePage(title: 'Overload'),
     );
   }
