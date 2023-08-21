@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gymapp/constants/themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  MyApp({super.key});
+  const MyApp({super.key});
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -76,26 +73,34 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-        child: _pages[_selectedIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
-            label: 'Exercises',
+        backgroundColor: Theme.of(context).colorScheme.background,
+        body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          child: _pages[_selectedIndex],
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+              border: Border(
+                  top: BorderSide(
+                      width: 2,
+                      color:
+                          Theme.of(context).colorScheme.secondaryContainer))),
+          child: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.fitness_center),
+                label: 'Exercises',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.show_chart),
+                label: 'Statistics',
+              ),
+            ],
+            onTap: _onItemTapped,
+            currentIndex: _selectedIndex,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart),
-            label: 'Statistics',
-          ),
-        ],
-        onTap: _onItemTapped,
-        currentIndex: _selectedIndex,
-      ),
-      // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        )
+        // This trailing comma makes auto-formatting nicer for build methods.
+        );
   }
 }

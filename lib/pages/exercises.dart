@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -212,8 +214,8 @@ class _Exercises extends State<Exercises> {
         actions: [
           IconButton(
             onPressed: () async {
-              await Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Settings()));
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Settings()));
               await fetchDB();
               setState(() {});
             },
@@ -244,7 +246,7 @@ class _Exercises extends State<Exercises> {
                                 color:
                                     Theme.of(context).colorScheme.onBackground),
                             decoration: InputDecoration(
-                              contentPadding: EdgeInsets.all(0),
+                              contentPadding: const EdgeInsets.all(0),
                               prefixIcon: Icon(
                                 Icons.search,
                                 color:
@@ -257,7 +259,7 @@ class _Exercises extends State<Exercises> {
                               ),
                               border: InputBorder.none,
                               hintText: 'Search',
-                              hintStyle: TextStyle(color: pbGrey),
+                              hintStyle: const TextStyle(color: pbGrey),
                             ))),
                     Container(
                       margin: const EdgeInsets.only(
@@ -279,7 +281,7 @@ class _Exercises extends State<Exercises> {
                         )
                     else
                       Column(children: [
-                        Center(
+                        const Center(
                           child: Icon(Icons.sentiment_very_dissatisfied,
                               size: 128, color: pbGrey),
                         ),

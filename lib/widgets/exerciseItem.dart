@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, no_logic_in_create_state, use_build_context_synchronously
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -25,8 +25,6 @@ class _ExerciseItem extends State<ExerciseItem> {
   @override
   void initState() {
     super.initState();
-    print("bodyPart: " + exercise.bodyPart);
-    print("reps: " + exercise.reps.first.toString());
     refreshExercises();
   }
 
@@ -38,7 +36,7 @@ class _ExerciseItem extends State<ExerciseItem> {
     return await showDialog(
         context: context,
         builder: (context) {
-          final TextEditingController _weightEditingController =
+          final TextEditingController weightEditingController =
               _weightController;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
@@ -73,11 +71,11 @@ class _ExerciseItem extends State<ExerciseItem> {
                             DateTime.now().toString().substring(0, 10);
                         if (!(exercise.updateDates.last == currentDate)) {
                           exercise.weights
-                              .add(double.parse(_weightEditingController.text));
+                              .add(double.parse(weightEditingController.text));
                           exercise.updateDates.add(currentDate);
                         } else {
                           exercise.weights.last =
-                              double.parse(_weightEditingController.text);
+                              double.parse(weightEditingController.text);
                         }
                         exercisesList[exercisesList.indexWhere(
                                 (element) => element.id == exercise.id)] =
@@ -201,7 +199,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                     fontWeight: FontWeight.w500,
                     fontSize: 10,
                     fontFeatures: [
-                      FontFeature.superscripts(),
+                      const FontFeature.superscripts(),
                     ],
                   ),
                 )

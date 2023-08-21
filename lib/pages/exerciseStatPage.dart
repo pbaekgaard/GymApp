@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, no_logic_in_create_state
 
 import 'package:flutter/material.dart';
 

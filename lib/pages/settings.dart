@@ -1,9 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gymapp/constants/themes.dart';
 
 import '../models/gym.dart';
@@ -39,7 +40,6 @@ class _SettingsState extends State<Settings> {
       isLoading = true;
     });
     gymList = await AppDatabase.instance.getGyms();
-    print(themeMode);
     setState(
       () => isLoading = false,
     );
@@ -110,7 +110,7 @@ class _SettingsState extends State<Settings> {
                                   await showColorPicker();
                                   setState(() => ());
                                 },
-                                child: Text("Choose color")),
+                                child: const Text("Choose color")),
                             Icon(
                               Icons.stop,
                               color: chosenColor,
@@ -146,8 +146,8 @@ class _SettingsState extends State<Settings> {
     return Consumer<ThemeService>(builder: (context, ThemeService theme, _) {
       themeMode = theme.mode;
       return isLoading
-          ? Center(
-              child: const CircularProgressIndicator(),
+          ? const Center(
+              child: CircularProgressIndicator(),
             )
           : Scaffold(
               backgroundColor: Theme.of(context).colorScheme.background,
@@ -172,8 +172,7 @@ class _SettingsState extends State<Settings> {
                         horizontal: 20, vertical: 15),
                     child: Column(
                       children: [
-                        Container(
-                            child: Column(
+                        Column(
                           children: [
                             Container(
                               alignment: Alignment.topLeft,
@@ -192,14 +191,14 @@ class _SettingsState extends State<Settings> {
                             Consumer<ThemeService>(
                                 builder: (context, ThemeService theme, _) {
                               return RadioListTile(
-                                  title: Row(children: [
+                                  title: const Row(children: [
                                     Icon(Symbols.night_sight_auto),
                                     Padding(
                                       padding: EdgeInsets.only(left: 8),
                                       child: Text("Follow system"),
                                     )
                                   ]),
-                                  contentPadding: EdgeInsets.all(0),
+                                  contentPadding: const EdgeInsets.all(0),
                                   controlAffinity:
                                       ListTileControlAffinity.trailing,
                                   value: 'system',
@@ -209,20 +208,19 @@ class _SettingsState extends State<Settings> {
                                     setState(() {
                                       themeMode = value;
                                     });
-                                    ;
                                   });
                             }),
                             Consumer<ThemeService>(
                                 builder: (context, ThemeService theme, _) {
                               return RadioListTile(
-                                  title: Row(children: [
+                                  title: const Row(children: [
                                     Icon(Symbols.dark_mode),
                                     Padding(
                                       padding: EdgeInsets.only(left: 8),
                                       child: Text("Dark mode"),
                                     )
                                   ]),
-                                  contentPadding: EdgeInsets.all(0),
+                                  contentPadding: const EdgeInsets.all(0),
                                   controlAffinity:
                                       ListTileControlAffinity.trailing,
                                   value: 'dark',
@@ -232,20 +230,19 @@ class _SettingsState extends State<Settings> {
                                     setState(() {
                                       themeMode = value;
                                     });
-                                    ;
                                   });
                             }),
                             Consumer<ThemeService>(
                                 builder: (context, ThemeService theme, _) {
                               return RadioListTile(
-                                  title: Row(children: [
+                                  title: const Row(children: [
                                     Icon(Symbols.light_mode),
                                     Padding(
                                       padding: EdgeInsets.only(left: 8),
                                       child: Text("Light mode"),
                                     )
                                   ]),
-                                  contentPadding: EdgeInsets.all(0),
+                                  contentPadding: const EdgeInsets.all(0),
                                   controlAffinity:
                                       ListTileControlAffinity.trailing,
                                   value: 'light',
@@ -255,13 +252,11 @@ class _SettingsState extends State<Settings> {
                                     setState(() {
                                       themeMode = value;
                                     });
-                                    ;
                                   });
                             }),
                           ],
-                        )),
-                        Container(
-                            child: Column(
+                        ),
+                        Column(
                           children: [
                             Container(
                               alignment: Alignment.topLeft,
@@ -285,9 +280,9 @@ class _SettingsState extends State<Settings> {
                                       if (gymList.isNotEmpty)
                                         for (Gym gym in gymList)
                                           Container(
-                                              margin:
-                                                  EdgeInsets.only(bottom: 8),
-                                              padding: EdgeInsets.all(15),
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 8),
+                                              padding: const EdgeInsets.all(15),
                                               decoration: BoxDecoration(
                                                   color: Theme.of(context)
                                                       .colorScheme
@@ -300,10 +295,10 @@ class _SettingsState extends State<Settings> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  Text("${gym.gymName}"),
+                                                  Text(gym.gymName),
                                                   Row(
                                                     children: [
-                                                      Text("Color:"),
+                                                      const Text("Color:"),
                                                       Icon(
                                                         Icons.stop,
                                                         color: Color(gym.color),
@@ -325,7 +320,7 @@ class _SettingsState extends State<Settings> {
                                       //       color:
                                       //           Theme.of(context).colorScheme.secondary,
                                       //     )),
-                                      Container(
+                                      SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width,
                                         child: TextButton(
@@ -351,7 +346,7 @@ class _SettingsState extends State<Settings> {
                                     ],
                                   )
                           ],
-                        )),
+                        ),
                       ],
                     )),
               ));
