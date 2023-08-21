@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -9,13 +11,13 @@ class StatisticsItem extends StatefulWidget {
   const StatisticsItem({Key? key, required this.exercise}) : super(key: key);
 
   @override
-  _StatisticsItem createState() => _StatisticsItem(exercise: exercise);
+  State<StatisticsItem> createState() => _StatisticsItem(exercise: exercise);
 }
 
 class _StatisticsItem extends State<StatisticsItem> {
   late List<Exercise> exercisesList;
   final Exercise exercise;
-  _StatisticsItem({Key? key, required this.exercise});
+  _StatisticsItem({required this.exercise});
 
   @override
   void initState() {
@@ -25,7 +27,7 @@ class _StatisticsItem extends State<StatisticsItem> {
   }
 
   Future refreshExercises() async {
-    exercisesList = await ExerciseDatabase.instance.readAllExercises();
+    exercisesList = await AppDatabase.instance.readAllExercises();
 
     setState(() {});
   }

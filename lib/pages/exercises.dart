@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
+import 'package:gymapp/pages/settings.dart';
 import 'package:gymapp/widgets/exerciseItem.dart';
 import 'package:gymapp/db/databaseHandler.dart';
+import 'package:gymapp/models/gym.dart';
 
 class Exercises extends StatefulWidget {
   const Exercises({Key? key}) : super(key: key);
 
   @override
-  _Exercises createState() => _Exercises();
+  State<Exercises> createState() => _Exercises();
 }
 
 class _Exercises extends State<Exercises> {
   late List<Exercise> exercisesList;
   late List<Exercise> filteredExercises = exercisesList;
-  final _exerciseController = TextEditingController();
+  late List<Gym> gymList;
+  String addExerciseGymSelection = '';
+  final _exerciseNameController = TextEditingController();
   final _weightController = TextEditingController();
   bool isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -22,7 +26,7 @@ class _Exercises extends State<Exercises> {
   @override
   void initState() {
     super.initState();
-    refreshExercises();
+    fetchDB();
   }
 
   void searchExercises(String value) {
@@ -32,7 +36,7 @@ class _Exercises extends State<Exercises> {
     } else {
       results = exercisesList
           .where((item) =>
-              item.exerciseText!.toLowerCase().contains(value.toLowerCase()))
+              item.exerciseText.toLowerCase().contains(value.toLowerCase()))
           .toList();
     }
 
@@ -41,10 +45,18 @@ class _Exercises extends State<Exercises> {
     });
   }
 
-  Future refreshExercises() async {
-    setState(() => isLoading = true);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fetchDB();
+  }
 
-    exercisesList = await ExerciseDatabase.instance.readAllExercises();
+  Future fetchDB() async {
+    setState(() => isLoading = true);
+    // Gym mockGym = new Gym(gymName: "gymName");
+    exercisesList = await AppDatabase.instance.readAllExercises();
+    // await AppDatabase.instance.addGym(mockGym);
+    gymList = await AppDatabase.instance.getGyms();
     setState(() => isLoading = false);
   }
 
@@ -54,21 +66,30 @@ class _Exercises extends State<Exercises> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
+                scrollable: true,
                 content: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
-                        controller: _exerciseController,
+                        controller: _exerciseNameController,
+                        autofocus: true,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onBackground),
                         validator: (value) {
                           if (value!.isNotEmpty) {
                             if (!value.contains(RegExp(r'[a-zA-Z]'))) {
                               return "Exercise title must contain at least one alphabetical character.";
-                            } else if (exercisesList
-                                .map((e) => e.exerciseText)
-                                .contains(value)) {
-                              return "This exercise already exists";
+                            } else if (exercisesList[exercisesList.indexWhere(
+                                            (element) =>
+                                                element.exerciseText == value)]
+                                        .gym ==
+                                    addExerciseGymSelection &&
+                                exercisesList
+                                    .map((e) => e.exerciseText)
+                                    .contains(value)) {
+                              return "This exercise already exists for this gym!";
                             } else {
                               return null;
                             }
@@ -76,12 +97,20 @@ class _Exercises extends State<Exercises> {
                             return "Invalid Input";
                           }
                         },
-                        decoration:
-                            const InputDecoration(hintText: "Exercise Name"),
+                        decoration: const InputDecoration(
+                            hintText: "e.g: Chest Press",
+                            hintStyle: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12),
+                            labelText: "Exercise:"),
                       ),
                       TextFormField(
                           keyboardType: TextInputType.number,
                           controller: _weightController,
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground),
                           validator: (value) {
                             if (value!.isNotEmpty) {
                               return null;
@@ -89,8 +118,41 @@ class _Exercises extends State<Exercises> {
                               return "Please specify a weight";
                             }
                           },
-                          decoration:
-                              const InputDecoration(hintText: "Weight")),
+                          decoration: const InputDecoration(
+                              hintText: "How did you do?",
+                              hintStyle: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12),
+                              labelText: "Weight: ")),
+                      DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 20),
+                          labelText: "Gym: ",
+                          labelStyle: TextStyle(fontSize: 20),
+                          hintStyle: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12),
+                        ),
+                        value: addExerciseGymSelection,
+                        disabledHint: const Text(
+                          "No Gym's Available",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        items: gymList.map((item) {
+                          return DropdownMenuItem(
+                            value: item.gymName,
+                            child: Text(item.gymName),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          // This is called when the user selects an item.
+                          setState(() {
+                            addExerciseGymSelection = value!;
+                          });
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -100,19 +162,29 @@ class _Exercises extends State<Exercises> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         Exercise newExercise = Exercise(
-                            exerciseText: _exerciseController.text,
+                            exerciseText: _exerciseNameController.text,
                             weights: [
                               double.parse(_weightController.text),
                             ],
                             updateDates: [
                               DateTime.now().toString().substring(0, 10),
-                            ]);
-                        await ExerciseDatabase.instance
-                            .addExercise(newExercise);
+                            ],
+                            gymColor: addExerciseGymSelection == 'No Gym Added'
+                                ? 0
+                                : gymList[gymList.indexWhere((element) =>
+                                        element.gymName ==
+                                        addExerciseGymSelection)]
+                                    .color,
+                            gym: addExerciseGymSelection == 'No Gym Added'
+                                ? ""
+                                : addExerciseGymSelection,
+                            reps: [8],
+                            bodyPart: "Chest");
+                        await AppDatabase.instance.addExercise(newExercise);
                         exercisesList.add(newExercise);
                         _weightController.clear();
-                        _exerciseController.clear();
-                        setState(() => (exercisesList = exercisesList));
+                        _exerciseNameController.clear();
+                        setState(() => {});
                         Navigator.of(context).pop();
                       }
                     },
@@ -125,7 +197,34 @@ class _Exercises extends State<Exercises> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: pbBG,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+        elevation: 0,
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.background,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        centerTitle: true,
+        title: Text("Overload",
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Settings()));
+              await fetchDB();
+              setState(() {});
+            },
+            icon: Icon(
+              Icons.settings,
+              size: 28,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          ),
+        ],
+      ),
       body: Container(
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -133,37 +232,44 @@ class _Exercises extends State<Exercises> {
                   padding: const EdgeInsets.only(bottom: 72),
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: TextFormField(
-                          onChanged: (value) => searchExercises(value),
-                          decoration: InputDecoration(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: TextFormField(
+                            onChanged: (value) => searchExercises(value),
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onBackground),
+                            decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(0),
                               prefixIcon: Icon(
                                 Icons.search,
-                                color: pbBlack,
+                                color:
+                                    Theme.of(context).colorScheme.onBackground,
                                 size: 20,
                               ),
-                              prefixIconConstraints: BoxConstraints(
+                              prefixIconConstraints: const BoxConstraints(
                                 maxHeight: 20,
                                 maxWidth: 25,
                               ),
                               border: InputBorder.none,
                               hintText: 'Search',
-                              hintStyle: TextStyle(color: pbGrey))),
-                    ),
+                              hintStyle: TextStyle(color: pbGrey),
+                            ))),
                     Container(
                       margin: const EdgeInsets.only(
                         bottom: 20,
                         top: 20,
                       ),
-                      child: const Text("Exercises",
+                      child: Text("Exercises",
                           style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w500,
-                              color: pbBlack)),
+                              color:
+                                  Theme.of(context).colorScheme.onBackground)),
                     ),
                     if (filteredExercises.isNotEmpty)
                       for (Exercise exercise in filteredExercises)
@@ -179,12 +285,17 @@ class _Exercises extends State<Exercises> {
                         ),
                         Center(
                             child: Text("No exercises added.",
-                                style: TextStyle(color: pbBlack))),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground))),
                       ]),
                   ],
                 )),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
+            addExerciseGymSelection =
+                gymList.isEmpty ? "No Gym Added" : gymList.first.gymName;
             await showAddExerciseDialog(context);
             setState(() {});
           },

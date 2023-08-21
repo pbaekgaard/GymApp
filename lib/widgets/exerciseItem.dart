@@ -1,4 +1,8 @@
+// ignore_for_file: file_names
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
@@ -8,25 +12,26 @@ class ExerciseItem extends StatefulWidget {
   const ExerciseItem({Key? key, required this.exercise}) : super(key: key);
 
   @override
-  _ExerciseItem createState() => _ExerciseItem(exercise: exercise);
+  State<ExerciseItem> createState() => _ExerciseItem(exercise: exercise);
 }
 
 class _ExerciseItem extends State<ExerciseItem> {
   late List<Exercise> exercisesList;
   final _weightController = TextEditingController();
   final Exercise exercise;
-  _ExerciseItem({Key? key, required this.exercise});
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  _ExerciseItem({required this.exercise});
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-
+    print("bodyPart: " + exercise.bodyPart);
+    print("reps: " + exercise.reps.first.toString());
     refreshExercises();
   }
 
   Future refreshExercises() async {
-    exercisesList = await ExerciseDatabase.instance.readAllExercises();
+    exercisesList = await AppDatabase.instance.readAllExercises();
   }
 
   Future<void> showUpdateExerciseDialog(BuildContext context) async {
@@ -45,6 +50,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                       TextFormField(
                           keyboardType: TextInputType.number,
                           controller: _weightController,
+                          autofocus: true,
                           validator: (value) {
                             if (value!.isNotEmpty) {
                               return null;
@@ -76,8 +82,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                         exercisesList[exercisesList.indexWhere(
                                 (element) => element.id == exercise.id)] =
                             updatedExercise;
-                        ExerciseDatabase.instance
-                            .updateExercise(updatedExercise);
+                        AppDatabase.instance.updateExercise(updatedExercise);
                         setState(() => ());
                         Navigator.of(context).pop();
                       }
@@ -95,9 +100,10 @@ class _ExerciseItem extends State<ExerciseItem> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-                title: Icon(Icons.delete, size: 32),
-                contentTextStyle: TextStyle(color: pbBlack, fontSize: 16),
-                content: Text("Are you sure you want to delete this exercise?"),
+                title: const Icon(Icons.delete, size: 32),
+                contentTextStyle: const TextStyle(color: pbBlack, fontSize: 16),
+                content: const Text(
+                    "Are you sure you want to delete this exercise?"),
                 actions: <Widget>[
                   TextButton(
                     child: const Text("Yes, remove it!"),
@@ -134,12 +140,12 @@ class _ExerciseItem extends State<ExerciseItem> {
                     content: Text('Deleted ${exercise.exerciseText}'),
                     action: SnackBarAction(
                         label: 'Undo', onPressed: () => delete = false),
-                    duration: Duration(seconds: 3),
+                    duration: const Duration(seconds: 3),
                   ),
                 );
                 await snackbarController.closed;
                 if (delete) {
-                  await ExerciseDatabase.instance.removeExercise(exercise);
+                  await AppDatabase.instance.removeExercise(exercise);
                 }
               }
               setState(() => {});
@@ -147,30 +153,62 @@ class _ExerciseItem extends State<ExerciseItem> {
             }
           },
           background: Container(
-            child: Icon(Icons.delete, color: Colors.white),
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: pbRed,
+              color: Theme.of(context).colorScheme.secondary,
             ),
+            child: const Row(children: [
+              Icon(Icons.delete, color: Colors.white),
+              Text(
+                "Remove",
+                style: TextStyle(color: Colors.white),
+              )
+            ]),
           ),
           secondaryBackground: Container(
-            child: Icon(Icons.edit, color: Colors.white),
             alignment: Alignment.centerRight,
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-                color: Colors.green, borderRadius: BorderRadius.circular(15)),
+                color: Theme.of(context).colorScheme.tertiary,
+                borderRadius: BorderRadius.circular(15)),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Edit ",
+                  style: TextStyle(color: Colors.white),
+                ),
+                Icon(Icons.edit, color: Colors.white)
+              ],
+            ),
           ),
           child: ListTile(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            tileColor: Colors.white,
-            title: Text(exercise.exerciseText,
-                style: const TextStyle(color: pbBlack)),
+            tileColor: Theme.of(context).colorScheme.primaryContainer,
+            title: Wrap(children: [
+              Text(exercise.exerciseText,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onBackground)),
+              if (exercise.gym != "")
+                Text(
+                  "${exercise.gym}",
+                  style: GoogleFonts.montserrat(
+                    color: Color(exercise.gymColor!),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10,
+                    fontFeatures: [
+                      FontFeature.superscripts(),
+                    ],
+                  ),
+                )
+            ]),
             trailing: Wrap(children: [
-              Text("${exercise.weights.last}kg",
+              Text(
+                  "${exercise.weights.last.truncateToDouble() == exercise.weights.last ? exercise.weights.last.toStringAsFixed(0) : num.parse(exercise.weights.last.toString())}kg",
                   style: TextStyle(
                       color: exercise.weights.length > 1
                           ? (exercise.weights.last >
@@ -179,9 +217,9 @@ class _ExerciseItem extends State<ExerciseItem> {
                               : exercise.weights.last ==
                                       exercise
                                           .weights[exercise.weights.length - 2]
-                                  ? pbBlack
-                                  : pbRed)
-                          : pbBlack)),
+                                  ? Theme.of(context).colorScheme.onBackground
+                                  : Theme.of(context).colorScheme.secondary)
+                          : Theme.of(context).colorScheme.onBackground)),
               exercise.weights.length > 1
                   ? (exercise.weights.last >
                           exercise.weights[exercise.weights.length - 2]
@@ -189,11 +227,15 @@ class _ExerciseItem extends State<ExerciseItem> {
                           size: 20, color: Colors.green)
                       : exercise.weights.last ==
                               exercise.weights[exercise.weights.length - 2]
-                          ? const Icon(Icons.trending_neutral,
-                              size: 20, color: pbBlack)
-                          : const Icon(Icons.trending_down,
-                              size: 20, color: pbRed))
-                  : const Icon(Icons.trending_neutral, size: 20, color: pbBlack)
+                          ? Icon(Icons.trending_neutral,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.onBackground)
+                          : Icon(Icons.trending_down,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.secondary))
+                  : Icon(Icons.trending_neutral,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onBackground)
             ]),
           )),
     );
