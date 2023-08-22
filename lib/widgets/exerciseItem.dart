@@ -39,7 +39,7 @@ class _ExerciseItem extends State<ExerciseItem> {
   void initState() {
     super.initState();
     _exerciseNameController =
-        new TextEditingController(text: exercise.exerciseText);
+        TextEditingController(text: exercise.exerciseText);
     refreshExercises();
   }
 
@@ -110,7 +110,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                                   editName = false;
                                 });
                               },
-                              icon: Icon(Icons.cancel),
+                              icon: const Icon(Icons.cancel),
                             )
                           else
                             IconButton(
@@ -124,7 +124,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                                       const Duration(milliseconds: 115));
                                   editNameFocusNode.requestFocus();
                                 },
-                                icon: Icon(Icons.edit))
+                                icon: const Icon(Icons.edit))
                         ],
                       ),
                       TextFormField(
@@ -171,20 +171,24 @@ class _ExerciseItem extends State<ExerciseItem> {
                         final String currentDate =
                             DateTime.now().toString().substring(0, 10);
                         if (!(exercise.updateDates.last == currentDate)) {
-                          if (weightEditingController.text.isNotEmpty)
+                          if (weightEditingController.text.isNotEmpty) {
                             exercise.weights.add(
                                 double.parse(weightEditingController.text));
-                          if (_exerciseRepController.text.isNotEmpty)
+                          }
+                          if (_exerciseRepController.text.isNotEmpty) {
                             exercise.reps
                                 .add(int.parse(_exerciseRepController.text));
+                          }
                           exercise.updateDates.add(currentDate);
                         } else {
-                          if (_exerciseRepController.text.isNotEmpty)
+                          if (_exerciseRepController.text.isNotEmpty) {
                             exercise.reps.last =
                                 int.parse(_exerciseRepController.text);
-                          if (weightEditingController.text.isNotEmpty)
+                          }
+                          if (weightEditingController.text.isNotEmpty) {
                             exercise.weights.last =
                                 double.parse(weightEditingController.text);
+                          }
                         }
                         exercisesList[exercisesList.indexWhere(
                                 (element) => element.id == exercise.id)] =
@@ -264,7 +268,6 @@ class _ExerciseItem extends State<ExerciseItem> {
                 await snackbarController.closed;
                 if (delete) {
                   await AppDatabase.instance.removeExercise(exercise);
-                  print(exercise.id);
                   dismissCallback();
                 }
               }
@@ -315,7 +318,7 @@ class _ExerciseItem extends State<ExerciseItem> {
                       color: Theme.of(context).colorScheme.onBackground)),
               if (exercise.gym != "")
                 Text(
-                  "${exercise.gym}",
+                  exercise.gym,
                   style: GoogleFonts.montserrat(
                     color: Color(exercise.gymColor!),
                     fontWeight: FontWeight.w500,

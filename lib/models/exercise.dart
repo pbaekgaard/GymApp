@@ -17,7 +17,7 @@ class Exercise {
   final List<double> weights;
   final List<int> reps;
   final List<String> updateDates;
-  final String? gym;
+  final String gym;
   final String bodyPart;
   final int? gymColor;
 
@@ -28,7 +28,7 @@ class Exercise {
       required this.updateDates,
       required this.reps,
       required this.bodyPart,
-      this.gym,
+      required this.gym,
       this.gymColor});
   String get updateDatesString => updateDates.join(',');
   Map<String, Object?> toJson() => {
@@ -50,7 +50,7 @@ class Exercise {
           .map((weightStr) => double.parse(weightStr))
           .toList(),
       updateDates: (json[ExerciseFields.updateDates] as String).split(','),
-      gym: json[ExerciseFields.gym] as String?,
+      gym: json[ExerciseFields.gym] as String,
       reps: (json['reps'] as String)
           .split(',')
           .map((repsString) => int.parse(repsString))

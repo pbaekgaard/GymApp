@@ -63,7 +63,7 @@ class _StatisticsItem extends State<StatisticsItem> {
                                     .onBackground)),
                         if (exercise.gym != "")
                           Text(
-                            "${exercise.gym}",
+                            exercise.gym,
                             style: GoogleFonts.montserrat(
                               color: Color(exercise.gymColor!),
                               fontWeight: FontWeight.w500,
