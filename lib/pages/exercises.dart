@@ -26,6 +26,7 @@ class _Exercises extends State<Exercises> {
   late List<Gym> gymList;
   late ThemeService themeManager;
   String addExerciseGymSelection = '';
+  String? chosenBodyPart = null;
   final _exerciseNameController = TextEditingController();
   final _weightController = TextEditingController();
   final _repsController = TextEditingController();
@@ -140,6 +141,38 @@ class _Exercises extends State<Exercises> {
                                 fontSize: 12),
                             labelText: "Exercise:"),
                       ),
+                      DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 20),
+                          labelText: "Bodypart: ",
+                          labelStyle: TextStyle(fontSize: 20),
+                          hintStyle: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12),
+                        ),
+                        hint: Text("Choose a Bodypart"),
+                        value: chosenBodyPart,
+                        validator: (value) {
+                          if (value == null) {
+                            return "You need to choose a body part!";
+                          } else {
+                            return null;
+                          }
+                        },
+                        items: bodyParts.map((item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(item),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          // This is called when the user selects an item.
+                          setState(() {
+                            chosenBodyPart = value!;
+                          });
+                        },
+                      ),
                       TextFormField(
                           keyboardType: TextInputType.number,
                           controller: _weightController,
@@ -181,6 +214,7 @@ class _Exercises extends State<Exercises> {
                                   fontSize: 12),
                               labelText: "Reps: ")),
                       DropdownButtonFormField(
+                        isExpanded: true,
                         decoration: const InputDecoration(
                           contentPadding: EdgeInsets.only(top: 20),
                           labelText: "Gym: ",
@@ -232,18 +266,26 @@ class _Exercises extends State<Exercises> {
                                     .color,
                             gym: addExerciseGymSelection,
                             reps: [int.parse(_repsController.text)],
-                            bodyPart: "Chest");
+                            bodyPart: chosenBodyPart!);
                         await AppDatabase.instance.addExercise(newExercise);
                         _weightController.clear();
                         _exerciseNameController.clear();
                         _repsController.clear();
+                        chosenBodyPart = null;
                         Navigator.of(context).pop();
                       }
                     },
                   )
                 ]);
           });
-        });
+        }).then((e) {
+      setState(() {
+        _exerciseNameController.clear();
+        _repsController.clear();
+        _weightController.clear();
+        chosenBodyPart = null;
+      });
+    });
   }
 
   @override
@@ -335,7 +377,7 @@ class _Exercises extends State<Exercises> {
                       ),
                     ),
                     if (filteredExercises.isNotEmpty)
-                      for (Exercise exercise in filteredExercises)
+                      for (Exercise exercise in filteredExercises.reversed)
                         ExerciseItem(
                           key: ValueKey(exercise.id),
                           exercise: exercise,
@@ -358,8 +400,11 @@ class _Exercises extends State<Exercises> {
                 )),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            addExerciseGymSelection =
-                gymList.isEmpty ? "No Gym Added" : gymList.first.gymName;
+            addExerciseGymSelection = gymList.isEmpty
+                ? "No Gym Added"
+                : gymList
+                    .firstWhere((gym) => gym.gymName == exercisesList.last.gym)
+                    .gymName;
             await showAddExerciseDialog(context);
             await fetchDB();
             searchExercises("");
