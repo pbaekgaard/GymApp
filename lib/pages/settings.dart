@@ -18,18 +18,24 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  late String? themeMode;
   bool isLoading = false;
   late List<Gym> gymList;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _gymNameController = TextEditingController();
-  late SharedPreferences prefs;
+  late ThemeMode _groupValue;
+  late ThemeService _themeManager;
   late Color chosenColor;
 
   @override
   void initState() {
     super.initState();
+    _themeManager = Provider.of<ThemeService>(context, listen: false);
+    _groupValue = _themeManager.themeMode;
     fetchGyms();
+  }
+
+  void updateTheme(ThemeMode themeMode) {
+    _themeManager.themeMode = themeMode;
   }
 
   @override
@@ -42,9 +48,6 @@ class _SettingsState extends State<Settings> {
       isLoading = true;
     });
     gymList = await AppDatabase.instance.getGyms();
-    prefs = await SharedPreferences.getInstance();
-    themeMode = prefs.getString("privatekey");
-    print(themeMode);
     setState(
       () => isLoading = false,
     );
@@ -205,14 +208,12 @@ class _SettingsState extends State<Settings> {
                                     contentPadding: const EdgeInsets.all(0),
                                     controlAffinity:
                                         ListTileControlAffinity.trailing,
-                                    value: 'system',
-                                    groupValue: themeMode,
-                                    onChanged: (String? value) async {
-                                      theme.setTheme(value!);
-                                      setState(() {
-                                        themeMode = value;
-                                      });
-                                    });
+                                    value: ThemeMode.system,
+                                    groupValue: _groupValue,
+                                    onChanged: (val) => setState(() {
+                                          _groupValue = val!;
+                                          updateTheme(val);
+                                        }));
                               }),
                               Consumer<ThemeService>(
                                   builder: (context, ThemeService theme, _) {
@@ -227,14 +228,12 @@ class _SettingsState extends State<Settings> {
                                     contentPadding: const EdgeInsets.all(0),
                                     controlAffinity:
                                         ListTileControlAffinity.trailing,
-                                    value: 'dark',
-                                    groupValue: themeMode,
-                                    onChanged: (String? value) async {
-                                      theme.setTheme(value!);
-                                      setState(() {
-                                        themeMode = value;
-                                      });
-                                    });
+                                    value: ThemeMode.dark,
+                                    groupValue: _groupValue,
+                                    onChanged: (val) => setState(() {
+                                          _groupValue = val!;
+                                          updateTheme(val);
+                                        }));
                               }),
                               Consumer<ThemeService>(
                                   builder: (context, ThemeService theme, _) {
@@ -249,14 +248,12 @@ class _SettingsState extends State<Settings> {
                                     contentPadding: const EdgeInsets.all(0),
                                     controlAffinity:
                                         ListTileControlAffinity.trailing,
-                                    value: 'light',
-                                    groupValue: themeMode,
-                                    onChanged: (String? value) async {
-                                      theme.setTheme(value!);
-                                      setState(() {
-                                        themeMode = value;
-                                      });
-                                    });
+                                    value: ThemeMode.light,
+                                    groupValue: _groupValue,
+                                    onChanged: (val) => setState(() {
+                                          _groupValue = val!;
+                                          updateTheme(val);
+                                        }));
                               }),
                             ],
                           ),

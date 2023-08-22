@@ -108,7 +108,9 @@ class _ExerciseItem extends State<ExerciseItem> {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
                 title: const Icon(Icons.delete, size: 32),
-                contentTextStyle: const TextStyle(color: pbBlack, fontSize: 16),
+                contentTextStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onBackground,
+                    fontSize: 16),
                 content: const Text(
                     "Are you sure you want to delete this exercise?"),
                 actions: <Widget>[

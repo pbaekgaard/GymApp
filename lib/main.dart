@@ -16,19 +16,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ThemeService>(
       create: (context) => ThemeService(),
-      child: Consumer(builder: (context, ThemeService theme, _) {
+      builder: (context, snapshot) {
+        final themeManager = Provider.of<ThemeService>(context);
         return MaterialApp(
           title: 'Overload',
           theme: light,
           darkTheme: dark,
-          themeMode: theme.mode == 'system'
-              ? ThemeMode.system
-              : theme.mode == 'dark'
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
+          themeMode: themeManager.themeMode,
           home: const MyHomePage(title: 'Overload'),
         );
-      }),
+      },
     );
   }
 }
