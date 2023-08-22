@@ -43,9 +43,9 @@ class _ExerciseStatPageState extends State<ExerciseStatPage> {
               children: [
                 for (final entry in exercise.updateDates.reversed)
                   ExerciseStatItem(
+                      reps: exercise.reps.last,
                       weight: exercise.weights[exercise.updateDates
-                              .indexWhere((element) => element == entry)]
-                          .toString(),
+                          .indexWhere((element) => element == entry)],
                       entryDate: entry,
                       previousWeight: exercise.updateDates
                                   .indexWhere((element) => element == entry) >=

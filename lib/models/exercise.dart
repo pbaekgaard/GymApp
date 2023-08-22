@@ -13,7 +13,7 @@ class ExerciseFields {
 
 class Exercise {
   final int? id;
-  final String exerciseText;
+  String exerciseText;
   final List<double> weights;
   final List<int> reps;
   final List<String> updateDates;
@@ -21,7 +21,7 @@ class Exercise {
   final String bodyPart;
   final int? gymColor;
 
-  const Exercise(
+  Exercise(
       {this.id,
       required this.exerciseText,
       required this.weights,

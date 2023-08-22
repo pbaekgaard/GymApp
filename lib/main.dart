@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,10 @@ import 'package:gymapp/constants/themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemStatusBarContrastEnforced: false,
+    statusBarColor: Colors.transparent,
+  ));
   runApp(const MyApp());
 }
 

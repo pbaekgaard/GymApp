@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
+import 'package:collection/collection.dart';
 
 class ExerciseItem extends StatefulWidget {
   final Exercise exercise;
@@ -21,6 +22,10 @@ class ExerciseItem extends StatefulWidget {
 class _ExerciseItem extends State<ExerciseItem> {
   late List<Exercise> exercisesList;
   final _weightController = TextEditingController();
+  late TextEditingController _exerciseNameController;
+  final _exerciseRepController = TextEditingController();
+  bool editName = false;
+  final FocusNode editNameFocusNode = FocusNode();
   final Exercise exercise;
   final Key key;
   final Function dismissCallback;
@@ -33,6 +38,8 @@ class _ExerciseItem extends State<ExerciseItem> {
   @override
   void initState() {
     super.initState();
+    _exerciseNameController =
+        new TextEditingController(text: exercise.exerciseText);
     refreshExercises();
   }
 
@@ -53,12 +60,96 @@ class _ExerciseItem extends State<ExerciseItem> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 200,
+                            child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                controller: _exerciseNameController,
+                                enabled: editName,
+                                focusNode: editNameFocusNode,
+                                validator: (value) {
+                                  if (value!.isNotEmpty) {
+                                    if (!value.contains(RegExp(r'[a-zA-Z]'))) {
+                                      return "Exercise title must contain at least one alphabetical character.";
+                                    } else if (exercisesList.isNotEmpty) {
+                                      if (exercisesList.firstWhereOrNull(
+                                              (element) =>
+                                                  element.exerciseText ==
+                                                  value) !=
+                                          null) {
+                                        if (exercisesList[exercisesList
+                                                        .indexWhere((element) =>
+                                                            element
+                                                                .exerciseText ==
+                                                            value)]
+                                                    .gym ==
+                                                exercise.exerciseText &&
+                                            exercisesList[exercisesList
+                                                    .indexWhere((element) =>
+                                                        element.exerciseText ==
+                                                        value)] !=
+                                                exercise) {
+                                          return "This exercise already exists for this gym!";
+                                        }
+                                      }
+                                    }
+                                  }
+                                  return null;
+                                },
+                                decoration: const InputDecoration(
+                                    hintText: "Exercise Name")),
+                          ),
+                          if (editName)
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _exerciseNameController.text =
+                                      exercise.exerciseText;
+                                  editName = false;
+                                });
+                              },
+                              icon: Icon(Icons.cancel),
+                            )
+                          else
+                            IconButton(
+                                onPressed:
+                                    // Enable Exercise Title form field
+                                    () async {
+                                  setState(() {
+                                    editName = true;
+                                  });
+                                  await Future.delayed(
+                                      const Duration(milliseconds: 115));
+                                  editNameFocusNode.requestFocus();
+                                },
+                                icon: Icon(Icons.edit))
+                        ],
+                      ),
                       TextFormField(
                           keyboardType: TextInputType.number,
-                          controller: _weightController,
+                          controller: _exerciseRepController,
                           autofocus: true,
                           validator: (value) {
                             if (value!.isNotEmpty) {
+                              return null;
+                            } else if (_exerciseNameController.text !=
+                                exercise.exerciseText) {
+                              return null;
+                            } else {
+                              return "Please specify an amount of reps!";
+                            }
+                          },
+                          decoration: const InputDecoration(hintText: "Reps")),
+                      TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: _weightController,
+                          validator: (value) {
+                            if (value!.isNotEmpty) {
+                              return null;
+                            } else if (_exerciseNameController.text !=
+                                exercise.exerciseText) {
                               return null;
                             } else {
                               return "Please specify a weight";
@@ -75,15 +166,25 @@ class _ExerciseItem extends State<ExerciseItem> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         Exercise updatedExercise = exercise;
+                        exercise.exerciseText = _exerciseNameController.text;
+
                         final String currentDate =
                             DateTime.now().toString().substring(0, 10);
                         if (!(exercise.updateDates.last == currentDate)) {
-                          exercise.weights
-                              .add(double.parse(weightEditingController.text));
+                          if (weightEditingController.text.isNotEmpty)
+                            exercise.weights.add(
+                                double.parse(weightEditingController.text));
+                          if (_exerciseRepController.text.isNotEmpty)
+                            exercise.reps
+                                .add(int.parse(_exerciseRepController.text));
                           exercise.updateDates.add(currentDate);
                         } else {
-                          exercise.weights.last =
-                              double.parse(weightEditingController.text);
+                          if (_exerciseRepController.text.isNotEmpty)
+                            exercise.reps.last =
+                                int.parse(_exerciseRepController.text);
+                          if (weightEditingController.text.isNotEmpty)
+                            exercise.weights.last =
+                                double.parse(weightEditingController.text);
                         }
                         exercisesList[exercisesList.indexWhere(
                                 (element) => element.id == exercise.id)] =
@@ -96,7 +197,16 @@ class _ExerciseItem extends State<ExerciseItem> {
                   )
                 ]);
           });
-        });
+        }).then((e) {
+      setState(() {
+        _exerciseNameController.text = exercise.exerciseText;
+        _exerciseRepController.clear();
+        _weightController.clear();
+      });
+      setState(() {
+        editName = false;
+      });
+    });
   }
 
   Future<bool> showRemoveExerciseDialog(BuildContext context) async {
