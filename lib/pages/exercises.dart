@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -97,11 +96,11 @@ class _Exercises extends State<Exercises> {
                               return "Exercise title must contain at least one alphabetical character.";
                             } else if (exercisesList.isNotEmpty) {
                               if (exercisesList.firstWhereOrNull((element) =>
-                                      element.exerciseText == value!) !=
+                                      element.exerciseText == value) !=
                                   null) {
                                 if (exercisesList[exercisesList.indexWhere(
                                             (element) =>
-                                                element.exerciseText == value!)]
+                                                element.exerciseText == value)]
                                         .gym ==
                                     addExerciseGymSelection) {
                                   return "This exercise already exists for this gym!";
