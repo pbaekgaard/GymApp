@@ -37,26 +37,62 @@ class _ExerciseStatPageState extends State<ExerciseStatPage> {
             title: Text(exercise.exerciseText,
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        body: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            child: Column(
-              children: [
-                for (final entry in exercise.updateDates.reversed)
-                  ExerciseStatItem(
-                      reps: exercise.reps.last,
-                      weight: exercise.weights[exercise.updateDates
-                          .indexWhere((element) => element == entry)],
-                      entryDate: entry,
-                      previousWeight: exercise.updateDates
-                                  .indexWhere((element) => element == entry) >=
-                              1
-                          ? exercise.weights[exercise.updateDates.indexWhere(
-                                      (element) => element == entry) -
-                                  1]
-                              .toString()
-                          : null)
-              ],
-            )));
+        body: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(bottom: 15),
+              padding: EdgeInsets.only(bottom: 20, left: 15, right: 15),
+              decoration: BoxDecoration(
+                border: BorderDirectional(
+                    bottom: BorderSide(
+                        color:
+                            Theme.of(context).colorScheme.secondaryContainer)),
+              ),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    //titles
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [Text("Gym:"), Text("Bodypart:")],
+                    ),
+                    //values
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          exercise.gym,
+                          style: TextStyle(color: Color(exercise.gymColor!)),
+                        ),
+                        Text(exercise.bodyPart),
+                      ],
+                    )
+                  ]),
+            ),
+            Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                child: Column(
+                  children: [
+                    for (final entry in exercise.updateDates.reversed)
+                      ExerciseStatItem(
+                          reps: exercise.reps.last,
+                          weight: exercise.weights[exercise.updateDates
+                              .indexWhere((element) => element == entry)],
+                          entryDate: entry,
+                          previousWeight: exercise.updateDates.indexWhere(
+                                      (element) => element == entry) >=
+                                  1
+                              ? exercise.weights[exercise.updateDates
+                                          .indexWhere(
+                                              (element) => element == entry) -
+                                      1]
+                                  .toString()
+                              : null)
+                  ],
+                ))
+          ],
+        ));
     // This trailing comma makes auto-formatting nicer for build methods.
   }
 }

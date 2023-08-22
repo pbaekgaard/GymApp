@@ -56,18 +56,22 @@ class _StatisticsItem extends State<StatisticsItem> {
                   child: FittedBox(
                       fit: BoxFit.contain,
                       child: Column(children: [
-                        Text(exercise.exerciseText,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onBackground)),
+                        Text(
+                          exercise.exerciseText,
+                          style: TextStyle(
+                            fontSize:
+                                MediaQuery.of(context).size.width * 0.0600,
+                            color: Theme.of(context).colorScheme.onBackground,
+                          ),
+                        ),
                         if (exercise.gym != "")
                           Text(
-                            "${exercise.gym}",
+                            exercise.gym,
                             style: GoogleFonts.montserrat(
                               color: Color(exercise.gymColor!),
-                              fontWeight: FontWeight.w500,
-                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.0250,
                               fontFeatures: [
                                 const FontFeature.superscripts(),
                               ],

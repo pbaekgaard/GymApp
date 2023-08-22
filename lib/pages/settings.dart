@@ -89,7 +89,9 @@ class _SettingsState extends State<Settings> {
                                   Theme.of(context).colorScheme.onBackground),
                           validator: (value) {
                             if (value!.isNotEmpty) {
-                              if (!value.contains(RegExp(r'[a-zA-Z]'))) {
+                              if (value.length > 25) {
+                                return "Max Characters is 25!";
+                              } else if (!value.contains(RegExp(r'[a-zA-Z]'))) {
                                 return "Gym name must contain at least one alphabetical character.";
                               } else if (gymList
                                   .map((e) => e.gymName)
@@ -296,7 +298,13 @@ class _SettingsState extends State<Settings> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    Text(gym.gymName),
+                                                    Expanded(
+                                                      child: Text(
+                                                        gym.gymName,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                      ),
+                                                    ),
                                                     Row(
                                                       children: [
                                                         const Text("Color:"),
@@ -309,19 +317,6 @@ class _SettingsState extends State<Settings> {
                                                     )
                                                   ],
                                                 )),
-                                        // Container(
-                                        //     padding: EdgeInsets.all(15),
-                                        //     width: MediaQuery.of(context).size.width,
-                                        //     decoration: BoxDecoration(
-                                        //         color: Theme.of(context)
-                                        //             .colorScheme
-                                        //             .secondaryContainer,
-                                        //         borderRadius: BorderRadius.circular(15)),
-                                        //     child: Icon(
-                                        //       Icons.add,
-                                        //       color:
-                                        //           Theme.of(context).colorScheme.secondary,
-                                        //     )),
                                         SizedBox(
                                           width:
                                               MediaQuery.of(context).size.width,

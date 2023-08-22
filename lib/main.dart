@@ -7,7 +7,7 @@ import 'package:gymapp/constants/themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemStatusBarContrastEnforced: false,
     statusBarColor: Colors.transparent,
   ));
