@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gymapp/pages/exercises.dart';
 import 'package:gymapp/pages/statistics.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,10 @@ import 'package:gymapp/constants/themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemStatusBarContrastEnforced: false,
+    statusBarColor: Colors.transparent,
+  ));
   runApp(const MyApp());
 }
 
@@ -16,19 +21,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ThemeService>(
       create: (context) => ThemeService(),
-      child: Consumer(builder: (context, ThemeService theme, _) {
+      builder: (context, snapshot) {
+        final themeManager = Provider.of<ThemeService>(context);
         return MaterialApp(
           title: 'Overload',
           theme: light,
           darkTheme: dark,
-          themeMode: theme.mode == 'system'
-              ? ThemeMode.system
-              : theme.mode == 'dark'
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
+          themeMode: themeManager.themeMode,
           home: const MyHomePage(title: 'Overload'),
         );
-      }),
+      },
     );
   }
 }

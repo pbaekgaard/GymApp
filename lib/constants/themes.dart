@@ -28,34 +28,38 @@ ThemeData dark = ThemeData.from(
 ));
 
 class ThemeService with ChangeNotifier {
-  SharedPreferences? prefs;
-  String? mode;
-  bool? test;
-  static String key = "privatekey";
+  late ThemeMode _themeMode;
+  ThemeMode defaultThemeMode = ThemeMode.system;
+
+  Future init() async {
+    await _getThemeModeFromSharedPrefs();
+  }
+
   ThemeService() {
-    mode = "system";
-    loadSharedPrefs();
+    _getThemeModeFromSharedPrefs();
   }
 
-  initSharedPrefs() async {
-    prefs = await SharedPreferences.getInstance();
+  ThemeMode get themeMode {
+    return _themeMode;
   }
 
-  loadSharedPrefs() async {
-    await initSharedPrefs();
-    mode = prefs!.getString(key);
+  set themeMode(ThemeMode themeMode) {
+    _themeMode = themeMode;
+    _saveThemeModeInSharedPrefs(themeMode);
     notifyListeners();
   }
 
-  saveSharedPrefs() async {
-    await initSharedPrefs();
-    await prefs!.setString(key, mode!);
+  Future _getThemeModeFromSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? themeModeFromPrefs = prefs.getString('themeMode');
+    _themeMode = ThemeMode.values.firstWhere(
+        (element) => themeModeFromPrefs == element.toString(),
+        orElse: () => defaultThemeMode);
     notifyListeners();
   }
 
-  setTheme(String themeMode) {
-    mode = themeMode;
-    saveSharedPrefs();
-    notifyListeners();
+  _saveThemeModeInSharedPrefs(ThemeMode themeMode) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('themeMode', themeMode.toString());
   }
 }
