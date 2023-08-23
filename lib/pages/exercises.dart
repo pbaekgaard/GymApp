@@ -401,9 +401,12 @@ class _Exercises extends State<Exercises> {
           onPressed: () async {
             addExerciseGymSelection = gymList.isEmpty
                 ? "No Gym Added"
-                : gymList
-                    .firstWhere((gym) => gym.gymName == exercisesList.last.gym)
-                    .gymName;
+                : exercisesList.isEmpty
+                    ? gymList.last.gymName
+                    : gymList
+                        .firstWhere(
+                            (gym) => gym.gymName == exercisesList.last.gym)
+                        .gymName;
             await showAddExerciseDialog(context);
             await fetchDB();
             searchExercises("");
