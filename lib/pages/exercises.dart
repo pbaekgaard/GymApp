@@ -2,6 +2,7 @@
 
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
+import 'package:gymapp/constants/bodyparts.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/constants/themes.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -33,14 +34,7 @@ class _Exercises extends State<Exercises> {
   bool isLoading = false;
   late List<String> filterOptions = [];
   late List<String> chosenFilters = [];
-  static List<String> bodyParts = [
-    "Triceps",
-    "Biceps",
-    "Back",
-    "Chest",
-    "Abs",
-    "Legs"
-  ];
+  final List<String> bodyParts = bodyparts;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override

@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:gymapp/constants/bodyparts.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:collection/collection.dart';
@@ -43,14 +44,7 @@ class _ExerciseItem extends State<ExerciseItem> {
       required this.dismissCallback});
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  static List<String> bodyParts = [
-    "Triceps",
-    "Biceps",
-    "Back",
-    "Chest",
-    "Abs",
-    "Legs"
-  ];
+  final List<String> bodyParts = bodyparts;
 
   @override
   void initState() {

@@ -1,5 +1,6 @@
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
+import 'package:gymapp/constants/bodyparts.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
@@ -20,14 +21,7 @@ class _StatisticsState extends State<Statistics> {
   late List<Gym> gymList;
   late List<String> filterOptions = [];
   late List<String> chosenFilters = [];
-  static List<String> bodyParts = [
-    "Triceps",
-    "Biceps",
-    "Back",
-    "Chest",
-    "Abs",
-    "Legs"
-  ];
+  final List<String> bodyParts = bodyparts;
 
   @override
   void initState() {
