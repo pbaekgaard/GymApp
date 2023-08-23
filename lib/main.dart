@@ -8,9 +8,8 @@ import 'package:gymapp/constants/themes.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemStatusBarContrastEnforced: false,
-    statusBarColor: Colors.transparent,
-  ));
+      systemStatusBarContrastEnforced: false,
+      statusBarColor: Colors.transparent));
   runApp(const MyApp());
 }
 
@@ -82,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
               border: Border(
                   top: BorderSide(
                       width: 2,

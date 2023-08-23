@@ -1,4 +1,4 @@
-package com.example.gymapp
+package dev.pbaekgaard.overload
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -3,7 +3,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:gymapp/pages/exerciseStatPage.dart';
@@ -67,13 +66,13 @@ class _StatisticsItem extends State<StatisticsItem> {
                         if (exercise.gym != "")
                           Text(
                             exercise.gym,
-                            style: GoogleFonts.montserrat(
+                            style: TextStyle(
                               color: Color(exercise.gymColor!),
                               fontWeight: FontWeight.w700,
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.0250,
-                              fontFeatures: [
-                                const FontFeature.superscripts(),
+                              fontFeatures: const [
+                                FontFeature.superscripts(),
                               ],
                             ),
                           )

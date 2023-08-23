@@ -1,6 +1,6 @@
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:gymapp/models/gym.dart';
@@ -66,7 +66,7 @@ class _StatisticsState extends State<Statistics> {
         ),
         body: Container(
             child: isLoading
-                ? const CircularProgressIndicator()
+                ? const Center(child: CircularProgressIndicator())
                 : ListView(
                     children: [
                       Container(
@@ -92,18 +92,32 @@ class _StatisticsState extends State<Statistics> {
                           ],
                         ),
                       ),
-                      SingleChildScrollView(
-                        child: GridView.count(
-                          physics: const ScrollPhysics(),
-                          crossAxisCount: 2,
-                          childAspectRatio: (1 / .4),
-                          shrinkWrap: true,
-                          children: [
-                            for (Exercise exercise in filteredExercises)
-                              StatisticsItem(exercise: exercise)
-                          ],
-                        ),
-                      )
+                      if (filteredExercises.isNotEmpty)
+                        SingleChildScrollView(
+                          child: GridView.count(
+                            physics: const ScrollPhysics(),
+                            crossAxisCount: 2,
+                            childAspectRatio: (1 / .4),
+                            shrinkWrap: true,
+                            children: [
+                              for (Exercise exercise in filteredExercises)
+                                StatisticsItem(exercise: exercise)
+                            ],
+                          ),
+                        )
+                      else
+                        Column(children: [
+                          const Center(
+                            child: Icon(Icons.sentiment_very_dissatisfied,
+                                size: 128, color: pbGrey),
+                          ),
+                          Center(
+                              child: Text("No exercises added.",
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground))),
+                        ]),
                     ],
                   )));
   }
@@ -126,8 +140,8 @@ class _StatisticsState extends State<Statistics> {
                       color: Theme.of(context).colorScheme.secondary)),
               backgroundColor: Theme.of(context).colorScheme.background),
           choiceChipTheme: ChoiceChipThemeData(
-              textStyle: GoogleFonts.montserrat(
-                  color: Theme.of(context).colorScheme.onBackground),
+              textStyle:
+                  TextStyle(color: Theme.of(context).colorScheme.onBackground),
               selectedShape: StadiumBorder(
                   side: BorderSide(
                       color: Theme.of(context).colorScheme.secondary,

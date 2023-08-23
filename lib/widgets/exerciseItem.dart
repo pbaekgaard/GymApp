@@ -2,7 +2,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gymapp/models/exercise.dart';
 import 'package:gymapp/db/databaseHandler.dart';
 import 'package:collection/collection.dart';
@@ -118,13 +117,16 @@ class _ExerciseItem extends State<ExerciseItem> {
                                 width: 200,
                                 child: TextFormField(
                                   decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(top: 20),
+                                    contentPadding:
+                                        const EdgeInsets.only(top: 20),
                                     labelText: "Title: ",
                                     labelStyle: TextStyle(
-                                        color: Colors.white60,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.normal),
-                                    hintStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground,
+                                      fontSize: 20,
+                                    ),
+                                    hintStyle: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                         fontWeight: FontWeight.w400,
                                         fontSize: 12),
@@ -198,11 +200,16 @@ class _ExerciseItem extends State<ExerciseItem> {
                                 width: 200,
                                 child: DropdownButtonFormField(
                                   focusNode: editBodyFocusNode,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.only(top: 20),
+                                  decoration: InputDecoration(
+                                    contentPadding:
+                                        const EdgeInsets.only(top: 20),
                                     labelText: "Bodypart: ",
-                                    labelStyle: TextStyle(fontSize: 20),
-                                    hintStyle: TextStyle(
+                                    labelStyle: TextStyle(
+                                        fontSize: 20,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onBackground),
+                                    hintStyle: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                         fontWeight: FontWeight.w400,
                                         fontSize: 12),
@@ -255,11 +262,17 @@ class _ExerciseItem extends State<ExerciseItem> {
                                 width: 200,
                                 child: DropdownButtonFormField(
                                   isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.only(top: 20),
+                                  decoration: InputDecoration(
+                                    contentPadding:
+                                        const EdgeInsets.only(top: 20),
                                     labelText: "Gym: ",
-                                    labelStyle: TextStyle(fontSize: 20),
-                                    hintStyle: TextStyle(
+                                    labelStyle: TextStyle(
+                                      fontSize: 20,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground,
+                                    ),
+                                    hintStyle: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                         fontWeight: FontWeight.w400,
                                         fontSize: 12),
@@ -477,12 +490,12 @@ class _ExerciseItem extends State<ExerciseItem> {
               if (exercise.gym != "")
                 Text(
                   exercise.gym,
-                  style: GoogleFonts.montserrat(
+                  style: TextStyle(
                     color: Color(exercise.gymColor!),
                     fontWeight: FontWeight.w500,
                     fontSize: 10,
-                    fontFeatures: [
-                      const FontFeature.superscripts(),
+                    fontFeatures: const [
+                      FontFeature.superscripts(),
                     ],
                   ),
                 )

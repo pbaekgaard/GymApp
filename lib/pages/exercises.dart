@@ -2,7 +2,6 @@
 
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gymapp/constants/colors.dart';
 import 'package:gymapp/constants/themes.dart';
 import 'package:gymapp/models/exercise.dart';
@@ -26,7 +25,7 @@ class _Exercises extends State<Exercises> {
   late List<Gym> gymList;
   late ThemeService themeManager;
   String addExerciseGymSelection = '';
-  String? chosenBodyPart = null;
+  String? chosenBodyPart;
   final _exerciseNameController = TextEditingController();
   final _weightController = TextEditingController();
   final _repsController = TextEditingController();
@@ -151,7 +150,7 @@ class _Exercises extends State<Exercises> {
                               fontWeight: FontWeight.w400,
                               fontSize: 12),
                         ),
-                        hint: Text("Choose a Bodypart"),
+                        hint: const Text("Choose a Bodypart"),
                         value: chosenBodyPart,
                         validator: (value) {
                           if (value == null) {
@@ -432,8 +431,8 @@ class _Exercises extends State<Exercises> {
                       color: Theme.of(context).colorScheme.secondary)),
               backgroundColor: Theme.of(context).colorScheme.background),
           choiceChipTheme: ChoiceChipThemeData(
-              textStyle: GoogleFonts.montserrat(
-                  color: Theme.of(context).colorScheme.onBackground),
+              textStyle:
+                  TextStyle(color: Theme.of(context).colorScheme.onBackground),
               selectedShape: StadiumBorder(
                   side: BorderSide(
                       color: Theme.of(context).colorScheme.secondary,

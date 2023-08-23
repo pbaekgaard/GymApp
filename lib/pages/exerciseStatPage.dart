@@ -40,8 +40,8 @@ class _ExerciseStatPageState extends State<ExerciseStatPage> {
         body: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(bottom: 15),
-              padding: EdgeInsets.only(bottom: 20, left: 15, right: 15),
+              margin: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.only(bottom: 20, left: 15, right: 15),
               decoration: BoxDecoration(
                 border: BorderDirectional(
                     bottom: BorderSide(
@@ -52,7 +52,7 @@ class _ExerciseStatPageState extends State<ExerciseStatPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     //titles
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [Text("Gym:"), Text("Bodypart:")],
                     ),
